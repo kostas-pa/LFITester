@@ -49,7 +49,8 @@ def urlCheck(url):
 		openn = urlopen(url)
 		return True	
 	except Exception as e:
-		print(colored('[-]', 'red', attrs=['bold']) + ' Not a valid url for LFI, ', e)
+		print(colored('[-]', 'red', attrs=['bold']) + ' Not a valid URL for LFI, ', e)
+		print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
 		return False
 		
 
