@@ -182,7 +182,6 @@ def main():
 		url = input('Please enter URL: ')
 		if urlCheck(url):
 			dirTraversalCheck(url)
-			dirTraversalCheck2(url)
 			headerCheck1(url)
 			headerCheck2(url)
 			filterCheck(url)
