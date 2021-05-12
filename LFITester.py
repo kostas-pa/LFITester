@@ -6,9 +6,6 @@
 # This script is not stealthy and will leave traces behind.
 # ONLY test this in a server you have permission to do it!!!!!!!
 
-# sources -->
-# http://www.compciv.org/guides/python/how-tos/creating-proper-url-query-strings/
-
 
 import requests
 import re
