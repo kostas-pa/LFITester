@@ -1,4 +1,5 @@
 import argparse
+from bannermagic import printBannerPadding, printMessage
 
 class ArgumentHandler:
 
@@ -16,10 +17,10 @@ class ArgumentHandler:
         self.proxy_depth = args.proxy_depth
 
     def printBanner(self):
-        print("========================================================")
-        print("                      LFITester                         ")
-        print("                 Automated LFI Testing                  ")
-        print("========================================================")
+        printBannerPadding('*')
+        printMessage('LFITester')
+        printMessage('Automated LFI Testing')
+        printBannerPadding('*')
 
     def ConfigureParser(self):   
         parser = argparse.ArgumentParser(prog='LFITester.py', description='LFI Automated tester.', epilog='Proxies in the list must be in the following format: protocol://{proxyip} username:password (newline). If you dont have a authenticated proxy then skip the username:password entry and go for a new line')
