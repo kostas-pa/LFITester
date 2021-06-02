@@ -3,7 +3,6 @@
 # CAUTION this script doesn't check for Remote File Inclusion (RFI)
 
 # DISCLAIMER
-# This script is not stealthy and will leave traces behind.
 # ONLY test this in a server you have permission to do it!!!!!!!
 
 from ArgumentHandler import ArgumentHandler
