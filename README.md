@@ -4,9 +4,7 @@ LFITester is a Python3 program which tests if a server is vulnerable to Local Fi
 
 It runs in Linux/Unix systems. In order to use this program:
 
-• you have to have Python3 installed in your system or you can download it
-
-from [here](https://www.python.org/downloads/).
+• you have to have Python3 installed in your system or you can download it from [here](https://www.python.org/downloads/).
 
 • Download the program or clone the repository in your system.
 
