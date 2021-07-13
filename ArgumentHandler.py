@@ -11,10 +11,13 @@ class ArgumentHandler:
         if args.input_url:
             self.url = args.input_url
         else: 
-            lines = []
-            for line in args.input_url_file:
-                lines.append(line.strip())
-            self.url = lines
+            if args.input_url_file:
+                lines = []
+                for line in args.input_url_file:
+                    lines.append(line.strip())
+                self.url = lines
+            else:
+                self.url = None
         if args.manual_proxy_list:
             self.proxy_list = manual_proxy_list
         elif args.input_proxy_file:
