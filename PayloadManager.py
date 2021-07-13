@@ -36,7 +36,7 @@ class Payload:
 
 	def Attack(self):
 		if self.checkArgs():
-			sys.exit
+			return False
 		else:
 			if type(self.url) == list:
 				for listt in self.url:
@@ -59,9 +59,10 @@ class Payload:
 			
 			
 			
-	def checkArgs(self):
+	def checkArgs(self): 
 		if len(sys.argv) == 1:
 			print(colored('[-]', 'red', attrs=['bold']) + ' error: missing a mandatory option (-u or -L). Use -h for more information')
+			sys.exit()
 			
 			
 			
