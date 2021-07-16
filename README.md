@@ -15,3 +15,6 @@ It runs in Linux/Unix systems. In order to use this program:
 • Then ```./setup.sh```
 
 • After that you can simply run LFITester as a command.
+
+# Credits
+• To [Konstantinos Pap](https://github.com/Konstantinos-Papanagnou) for assisting with this project and the knowledge he provided.
