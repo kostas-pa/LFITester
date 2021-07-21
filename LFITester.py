@@ -20,7 +20,7 @@ def main():
 		print(colored("If it doesn't show any results that means it didn't find anything!!!", 'blue'))
 		if type(arghandler.url) is not list:
 			print(colored(f"Testing: {arghandler.url}\n\n", 'green'))
-			PayloadManager.Payload(arghandler.url, verbosity=arghandler.verbosity)
+			PayloadManager.Payload(arghandler.url, arghandler.outfile, verbosity=arghandler.verbosity)
 		else:
 			for url in arghandler.url:
 				print(colored(f"Testing: {url}\n\n", 'green'))

