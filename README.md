@@ -14,7 +14,7 @@ It runs in Linux/Unix systems. In order to use this program:
 
 • First run the command ```sudo chmod +x setup.sh```
 
-• Then run ```pip install -r requirements.txt``` and ```./setup.sh```
+• Then run ```sudo pip install -r requirements.txt``` and ```sudo ./setup.sh```
 
 • After that you can simply run LFITester as a command.
 
