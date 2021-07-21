@@ -8,11 +8,11 @@ It runs in Linux/Unix systems. In order to use this program:
 
 • Download the program or clone the repository in your system
 
-• Go into the LFITester folder
+• Go to the LFITester folder
 
 • First run the command ```sudo chmod +x setup.sh```
 
-• Then ```./setup.sh```
+• Then run ```pip install -r requirements.txt``` and ```./setup.sh```
 
 • After that you can simply run LFITester as a command.
 
