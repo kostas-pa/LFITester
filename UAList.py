@@ -56,8 +56,10 @@ user_agents = [
 	'Mozilla/5.0 (Linux; U; en-US) AppleWebKit/528.5+ (KHTML, like Gecko, Safari/528.5+) Version/4.0 Kindle/3.0 (screen 600x800; rotate)'
 ]
 
+#Compatible with requests library
 def fetchUA():
 	return {'User-Agent': user_agents[random.randint(0,len(user_agents)-1)]}
 
+#Compatible with urllib library
 def fetchAgent():
 	return user_agents[random.randint(0,len(user_agents)-1)]

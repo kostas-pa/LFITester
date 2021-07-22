@@ -9,6 +9,7 @@ from ArgumentHandler import ArgumentHandler
 from termcolor import colored
 import PayloadManager
 import sys
+from proxies_list import clean_proxies
 	
 def main():
 	try:
@@ -16,6 +17,9 @@ def main():
 		if not arghandler.url:
 			arghandler.parser.print_help(sys.stderr)
 			exit(1)
+		if arghandler.enable_proxies:
+			print(colored("Detected Enabled Proxies. Setting up proxy list...",'green'))
+			clean_proxies()
 		print(colored("This script doesn't check for Remote File Inclusion (RFI)", 'blue'))
 		print(colored("If it doesn't show any results that means it didn't find anything!!!", 'blue'))
 		if type(arghandler.url) is not list:
