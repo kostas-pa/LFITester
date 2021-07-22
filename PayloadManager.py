@@ -43,7 +43,7 @@ class Payload:
 			self.cookieCheck()
 			self.logPoisonCheck()
 			
-	# DON'T touch it, it sends the url as is without decoding it first, so that it can bypass filters that look for ..
+	# It sends the url as is without decoding it first, so that it can bypass filters that look for ..
 	def hit(self, url):
 		if self.proxies:
 			proxy_support = urllib.request.ProxyHandler(fetch_proxy())
@@ -97,7 +97,8 @@ class Payload:
 				clean = self.hit(compUrl)
 				if 'root:x' in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
-					self.outfile.write('[+] Directory traversal found with ' + compUrl + '\n')
+					if self.outfile is not None:
+						self.outfile.write('[+] Directory traversal found with ' + compUrl + '\n')
 				else:
 					if self.verbosity > 0:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
@@ -114,7 +115,8 @@ class Payload:
 			clean = self.hit(compUrl)
 			if 'uid=' in clean.lower():
 				print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl)
-				self.outfile.write('[+] Remote code execution (RCE) found with ' + compUrl + '\n')
+				if self.outfile is not None:
+					self.outfile.write('[+] Remote code execution (RCE) found with ' + compUrl + '\n')
 			else:
 				if self.verbosity > 0:
 					print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
@@ -132,7 +134,8 @@ class Payload:
 				for word in words:
 					if word.endswith('='):
 						print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
-						self.outfile.write('[+] Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
+						if self.outfile is not None:
+							self.outfile.write('[+] Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
 					else:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
@@ -162,7 +165,8 @@ class Payload:
 				clean = self.hit(compUrl)	
 				if 'uid='  in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned')
-					self.outfile.write('[+] Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned\n')
+					if self.outfile is not None:
+						self.outfile.write('[+] Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned\n')
 				else:
 					if self.verbosity > 0:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')
@@ -186,7 +190,8 @@ class Payload:
 					clean = self.hit(compUrl)
 					if "uid=" in clean.lower():
 						print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)
-						self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathth + '\n')
+						if self.outfile is not None:
+							self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathth + '\n')
 					else:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')		
@@ -203,7 +208,8 @@ class Payload:
 					clean = self.hit(compUrl)
 					if "uid=" in clean.lower():
 						print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
-						self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
+						if self.outfile is not None:
+							self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
 					else:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')	
