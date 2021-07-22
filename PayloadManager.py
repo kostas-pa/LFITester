@@ -1,6 +1,7 @@
-from UAList import fetchUA
+from UAList import fetchUA, fetchAgent
 import re
 import requests
+import urllib
 from urllib.parse import quote
 from urllib.request import urlopen
 from termcolor import colored
@@ -42,7 +43,9 @@ class Payload:
 			
 	# DON'T touch it, it sends the url as is without decoding it first, so that it can bypass filters that look for ..
 	def hit(self, url):
-		response = urlopen(url)
+		request = urllib.request.Request(url)
+		request.add_header('User-Agent', fetchAgent())
+		response = urlopen(request)
 		response = str(response.read())
 		return self.stripHtmlTags(response)
 

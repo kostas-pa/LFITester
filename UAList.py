@@ -58,3 +58,6 @@ user_agents = [
 
 def fetchUA():
 	return {'User-Agent': user_agents[random.randint(0,len(user_agents)-1)]}
+
+def fetchAgent():
+	return user_agents[random.randint(0,len(user_agents)-1)]
