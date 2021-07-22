@@ -34,5 +34,5 @@ class ArgumentHandler:
         parser.add_argument('-L', '--list-URLs', dest="input_url_file", help='Input a list of URLs from an external file. The URLs format must be http://[URL]?[something]=', type=argparse.FileType('r'))
         parser.add_argument('-v', '--verbose', action='count', help='Increase output verbosity', default=0)
         parser.add_argument('-o', '--output', dest="outfile", help='The file to save the results', type=argparse.FileType('w'))
-        parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overrided! Note that the the proxies will be picked at random for each request")
+        parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overrided! Note that the proxies will be picked at random for each request")
         return parser
