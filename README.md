@@ -1,3 +1,10 @@
+# DISCLAIMER
+• This tool is for educational purpuses olnly.
+
+• We are not responsible for any illigal usage of this tool.
+
+
+
 # LFITester
 
 LFITester is a Python3 tool which tests if a server is vulnerable to Local File Inclusion (LFI) attack.
