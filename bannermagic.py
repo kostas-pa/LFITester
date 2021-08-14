@@ -28,10 +28,3 @@ def printMessage(message, location=Location.center):
 
 	print(' '*spaces + message)
 
-
-if __name__ == '__main__':
-	printBannerPadding('*')
-	printMessage('Hello i am centered!')
-	printMessage('Hello i am on the left!', location=Location.left)
-	printMessage('Hello i am on the right!', location=Location.right)
-	printBannerPadding('*')
