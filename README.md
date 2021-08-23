@@ -1,7 +1,7 @@
 # DISCLAIMER
 • This tool is for educational purpuses olnly.
 
-• We are not responsible for any illigal usage of this tool.
+• We are not responsible for any illegal usage of this tool.
 
 
 
