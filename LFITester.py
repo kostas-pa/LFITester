@@ -9,26 +9,13 @@ from ArgumentHandler import ArgumentHandler
 from termcolor import colored
 import PayloadManager
 import sys
+from pyfiglet import Figlet
 from proxies_list import clean_proxies
 	
 def main():
 	try:
-		print("""   ,--,                             ,----,                                                 
-,---.'|                           ,/   .`|                                                 
-|   | :       ,---,.   ,---,    ,`   .'  :                      ___                        
-:   : |     ,'  .' |,`--.' |  ;    ;     /                    ,--.'|_                      
-|   ' :   ,---.'   ||   :  :.'___,/    ,'                     |  | :,'             __  ,-. 
-;   ; '   |   |   .':   |  '|    :     |            .--.--.   :  : ' :           ,' ,'/ /| 
-'   | |__ :   :  :  |   :  |;    |.';  ;   ,---.   /  /    '.;__,'  /     ,---.  '  | |' | 
-|   | :.'|:   |  |-,'   '  ;`----'  |  |  /     \ |  :  /`./|  |   |     /     \ |  |   ,' 
-'   :    ;|   :  ;/||   |  |    '   :  ; /    /  ||  :  ;_  :__,'| :    /    /  |'  :  /   
-|   |  ./ |   |   .''   :  ;    |   |  '.    ' / | \  \    `. '  : |__ .    ' / ||  | '    
-;   : ;   '   :  '  |   |  '    '   :  |'   ;   /|  `----.   \|  | '.'|'   ;   /|;  : |    
-|   ,/    |   |  |  '   :  |    ;   |.' '   |  / | /  /`--'  /;  :    ;'   |  / ||  , ;    
-'---'     |   :  \  ;   |.'     '---'   |   :    |'--'.     / |  ,   / |   :    | ---'     
-          |   | ,'  '---'                \   \  /   `--'---'   ---`-'   \   \  /           
-          `----'                          `----'                         `----'            
-                                                                                           """)
+		ascii_art = Figlet(font='big')
+		print(colored(ascii_art.renderText('LFITester'), 'yellow'))
 		arghandler = ArgumentHandler()
 		if not arghandler.url:
 			arghandler.parser.print_help(sys.stderr)
