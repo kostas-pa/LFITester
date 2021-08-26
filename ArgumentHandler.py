@@ -29,7 +29,7 @@ class ArgumentHandler:
         printBannerPadding('*')
 
     def ConfigureParser(self):   
-        parser = argparse.ArgumentParser(prog='LFITester.py', description='LFI Automated tester.', epilog='Proxies in the list must be in the following format: protocol://{proxyip} username:password (newline). If you dont have a authenticated proxy then skip the username:password entry and go for a new line')
+        parser = argparse.ArgumentParser(prog='LFITester.py', epilog='Proxies in the list must be in the following format: protocol://{proxyip} username:password (newline). If you dont have a authenticated proxy then skip the username:password entry and go for a new line')
         parser.add_argument('-u', '--url', dest="input_url", help='The url to test. The URL format must be http://[URL]?[something]=')
         parser.add_argument('-L', '--list-URLs', dest="input_url_file", help='Input a list of URLs from an external file. The URLs format must be http://[URL]?[something]=', type=argparse.FileType('r'))
         parser.add_argument('-v', '--verbose', action='count', help='Increase output verbosity', default=0)
