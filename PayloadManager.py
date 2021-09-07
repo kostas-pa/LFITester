@@ -221,5 +221,5 @@ class Payload:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')	
 		else:
-			print(colored('[-]', 'red', attrs=['bold']) + " A directory traversal attack is VALID but the server type " + url.getheader('Server') + " is not supported!!!")
+			print(colored('[-]', 'red', attrs=['bold']) + " The server type " + url.getheader('Server') + " is not supported!!!")
 
