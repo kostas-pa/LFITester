@@ -4,6 +4,7 @@ import requests
 import urllib
 from urllib.parse import quote
 from urllib.request import urlopen
+from urllib.error import URLError, HTTPError
 from termcolor import colored
 from proxies_list import fetch_proxy
 
@@ -49,11 +50,17 @@ class Payload:
 			proxy_support = urllib.request.ProxyHandler(fetch_proxy())
 			opener = urllib.request.build_opener(proxy_support)
 			urllib.request.install_opener(opener)
-		request = urllib.request.Request(url)
-		request.add_header('User-Agent', fetchAgent())
-		response = urlopen(request)
-		response = str(response.read())
-		return self.stripHtmlTags(response)
+		try:
+			request = urllib.request.Request(url)
+			request.add_header('User-Agent', fetchAgent())
+			response = urlopen(request)
+			response = str(response.read())
+			return self.stripHtmlTags(response)
+		
+		except HTTPError as e:
+    			print(colored('[-]', 'red', attrs=['bold']) + ' Error code: ', e.code)		
+		except URLError as e:
+   			 print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ', e.reason) 
 
 	# Checks if the url is valid
 	def urlCheck(self):
