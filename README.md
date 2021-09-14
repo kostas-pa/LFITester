@@ -27,39 +27,31 @@ It runs in Linux/Unix systems but it can run on windows as well. In order to use
 
 ```
 $python3 LFITester.py 
-   ,--,                             ,----,                                                 
-,---.'|                           ,/   .`|                                                 
-|   | :       ,---,.   ,---,    ,`   .'  :                      ___                        
-:   : |     ,'  .' |,`--.' |  ;    ;     /                    ,--.'|_                      
-|   ' :   ,---.'   ||   :  :.'___,/    ,'                     |  | :,'             __  ,-. 
-;   ; '   |   |   .':   |  '|    :     |            .--.--.   :  : ' :           ,' ,'/ /| 
-'   | |__ :   :  :  |   :  |;    |.';  ;   ,---.   /  /    '.;__,'  /     ,---.  '  | |' | 
-|   | :.'|:   |  |-,'   '  ;`----'  |  |  /     \ |  :  /`./|  |   |     /     \ |  |   ,' 
-'   :    ;|   :  ;/||   |  |    '   :  ; /    /  ||  :  ;_  :__,'| :    /    /  |'  :  /   
-|   |  ./ |   |   .''   :  ;    |   |  '.    ' / | \  \    `. '  : |__ .    ' / ||  | '    
-;   : ;   '   :  '  |   |  '    '   :  |'   ;   /|  `----.   \|  | '.'|'   ;   /|;  : |    
-|   ,/    |   |  |  '   :  |    ;   |.' '   |  / | /  /`--'  /;  :    ;'   |  / ||  , ;    
-'---'     |   :  \  ;   |.'     '---'   |   :    |'--'.     / |  ,   / |   :    | ---'     
-          |   | ,'  '---'                \   \  /   `--'---'   ---`-'   \   \  /           
-          `----'                          `----'                         `----'            
-                                                                                           
-********************************************************************************
-                                   LFITester
-                             Automated LFI Testing
-********************************************************************************
-usage: LFITester.py [-h] [-u INPUT_URL] [-L INPUT_URL_FILE] [-v]
-                    [-o [OUTFILE]] [-p]
+ _      ______ _____ _______        _            
+| |    |  ____|_   _|__   __|      | |           
+| |    | |__    | |    | | ___  ___| |_ ___ _ __ 
+| |    |  __|   | |    | |/ _ \/ __| __/ _ \ '__|
+| |____| |     _| |_   | |  __/\__ \ ||  __/ |   
+|______|_|    |_____|  |_|\___||___/\__\___|_|   
+                                                 
+                                                 
 
-LFI Automated tester.
+********************************************************************************************
+                                         LFITester
+                                   Automated LFI Testing
+********************************************************************************************
+usage: LFITester.py [-h] [-u INPUT_URL] [-L INPUT_URL_FILE] [-c] [-v]
+                    [-o [OUTFILE]] [-p]
 
 optional arguments:
   -h, --help            show this help message and exit
   -u INPUT_URL, --url INPUT_URL
-                        The url to test. The URL format must be
+                        The url to test. The URL usually is
                         http://[URL]?[something]=
   -L INPUT_URL_FILE, --list-URLs INPUT_URL_FILE
                         Input a list of URLs from an external file. The URLs
-                        format must be http://[URL]?[something]=
+                        format usually is http://[URL]?[something]=
+  -c, --crawl           use the crawler to test all the endpoints
   -v, --verbose         Increase output verbosity
   -o [OUTFILE], --output [OUTFILE]
                         The file to save the results
@@ -69,9 +61,15 @@ optional arguments:
                         be overrided! Note that the proxies will be picked at
                         random for each request
 
-Proxies in the list must be in the following format: protocol://{proxyip}
-username:password (newline). If you dont have a authenticated proxy then skip
-the username:password entry and go for a new line
+Proxies in the list must be in the following format: protocol://{proxyip} 
+username:password (newline). If you dont have a authenticated 
+proxy then skip the username:password entry and go for a new line
+
+Examples: 
+            LFITester.py -u http://URL?smt= = test one specific endpoint
+            LFITester.py -L test.txt = test a list of endpoints from file
+            LFITester.py -c -u http://URL = crawl and test all endpoints that URL
+            LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file
 
 ```
 
