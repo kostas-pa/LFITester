@@ -38,7 +38,7 @@ proxy then skip the username:password entry and go for a new line
 Examples: 
             LFITester.py -u http://URL?smt= = test one specific endpoint
             LFITester.py -L test.txt = test a list of endpoints from file
-            LFITester.py -c -u http://URL = crawl and test all endpoints that URL
+            LFITester.py -c -u http://URL = crawl and test all endpoints of that URL
             LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file''', formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument('-u', '--url', dest="input_url", help='The url to test. The URL usually is http://[URL]?[something]=')
         parser.add_argument('-L', '--list-URLs', dest="input_url_file", help='Input a list of URLs from an external file. The URLs format usually is http://[URL]?[something]=', type=argparse.FileType('r'))
