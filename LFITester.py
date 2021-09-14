@@ -11,6 +11,7 @@ import PayloadManager
 import sys
 from pyfiglet import Figlet
 from proxies_list import clean_proxies
+from Crawler import webcrawler
 	
 def main():
 	try:
@@ -26,12 +27,25 @@ def main():
 		print(colored("This script doesn't check for Remote File Inclusion (RFI)", 'blue'))
 		print(colored("If it doesn't show any results that means it didn't find anything!!!", 'blue'))
 		if type(arghandler.url) is not list:
-			print(colored(f"Testing: {arghandler.url}\n\n", 'green'))
-			PayloadManager.Payload(arghandler.url, arghandler.outfile, verbosity=arghandler.verbosity)
+			if arghandler.crawler:
+				test_urls = webcrawler(arghandler.url)
+				for url in test_urls:
+					print(colored(f"Testing: {url}\n\n", 'green'))
+					PayloadManager.Payload(url, arghandler.outfile, verbosity=arghandler.verbosity)
+			else:
+				print(colored(f"Testing: {arghandler.url}\n\n", 'green'))
+				PayloadManager.Payload(arghandler.url, arghandler.outfile, verbosity=arghandler.verbosity)
 		else:
-			for url in arghandler.url:
-				print(colored(f"Testing: {url}\n\n", 'green'))
-				PayloadManager.Payload(url, verbosity = arghandler.verbosity)
+			if arghandler.crawler:
+				for url in arghandler.url:
+					test_urls = webcrawler(url)
+					for endpoint in test_urls:
+						print(colored(f"Testing: {endpoint}\n\n", 'green'))
+						PayloadManager.Payload(endpoint, arghandler.outfile, verbosity = arghandler.verbosity)
+			else:
+				for url in arghandler.url:
+					print(colored(f"Testing: {url}\n\n", 'green'))
+					PayloadManager.Payload(url, arghandler.outfile, verbosity = arghandler.verbosity)
 	except KeyboardInterrupt:
 		print('\nGracefully Exiting...\n')
 	

