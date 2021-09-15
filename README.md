@@ -75,5 +75,8 @@ Examples:
 
 • Basic Usage: `python3 LFITester.py -v -u http://myvulnerabledomain/vulnerable/application?test_param=`
 
+# Sidenote
+• If you like this program please consider giving it a star
+
 # Credits
-• To [Konstantinos Pap](https://github.com/Konstantinos-Papanagnou) for assisting with this project and the knowledge he provided.
+• To [Konstantinos Pap](https://github.com/Konstantinos-Papanagnou) for assisting me with this project and for the knowledge he provided.
