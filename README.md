@@ -1,5 +1,5 @@
 # DISCLAIMER
-• This tool is for educational purpuses olnly.
+• This tool is for educational purpuses only.
 
 • We are not responsible for any illegal usage of this tool.
 
