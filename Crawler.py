@@ -16,6 +16,7 @@ def get_links(url):
 			continue
 		# Join the URL if it's relative
 		href = urljoin(url, href)
+		# This if statement ensures that all the URLs tested will be internal
 		if domain in href:
 			links.add(href)
 	return links
