@@ -23,6 +23,7 @@ class ArgumentHandler:
         self.crawler = args.crawler
         self.enable_proxies = args.enabled_proxies
         self.outfile = args.outfile
+        self.creds = args.creds
 
     def printBanner(self):
         printBannerPadding('*')
@@ -39,11 +40,13 @@ Examples:
             LFITester.py -u http://URL?smt= = test one specific endpoint
             LFITester.py -L test.txt = test a list of endpoints from file
             LFITester.py -c -u http://URL = crawl and test all endpoints of that URL
-            LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file''', formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument('-u', '--url', dest="input_url", help='The url to test. The URL usually is http://[URL]?[something]=')
-        parser.add_argument('-L', '--list-URLs', dest="input_url_file", help='Input a list of URLs from an external file. The URLs format usually is http://[URL]?[something]=', type=argparse.FileType('r'))
+            LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file
+            LFITester.py --creds abc:abc -u http://URL?smt= = test one specific endpoint which requires a login''', formatter_class=RawDescriptionHelpFormatter)
+        parser.add_argument('-u', '--url', dest="input_url", metavar='URL', help='The url to test. The URL usually is http://[URL]?[something]=')
+        parser.add_argument('-L', '--list-url', dest="input_url_file", metavar='URL_File', help='Input a list of URLs from an external file. The URLs format usually is http://[URL]?[something]=', type=argparse.FileType('r'))
         parser.add_argument('-c', '--crawl', dest="crawler", action='store_true', help='use the crawler to test all the endpoints')
         parser.add_argument('-v', '--verbose', action='count', help='Increase output verbosity', default=0)
         parser.add_argument('-o', '--output', nargs='?', dest="outfile", help='The file to save the results', type=argparse.FileType('w'))
+        parser.add_argument('--creds', nargs='?', dest="creds", metavar='user:pass', help='The credentials to login', type=str)
         parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="""Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overrided! Note that the proxies will be picked at random for each request""")
         return parser

