@@ -36,30 +36,26 @@ $python3 LFITester.py
                                                  
                                                  
 
-********************************************************************************************
-                                         LFITester
-                                   Automated LFI Testing
-********************************************************************************************
-usage: LFITester.py [-h] [-u INPUT_URL] [-L INPUT_URL_FILE] [-c] [-v]
-                    [-o [OUTFILE]] [-p]
+*************************************************************************************************************************
+                                                        LFITester
+                                                  Automated LFI Testing
+*************************************************************************************************************************
+usage: LFITester.py [-h] [-u URL] [-L URL_File] [-c] [-v] [-o [OUTFILE]] [--creds [user:pass]] [-p]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -u INPUT_URL, --url INPUT_URL
-                        The url to test. The URL usually is
+  -u URL, --url URL     The url to test. The URL usually is http://[URL]?[something]=
+  -L URL_File, --list-url URL_File
+                        Input a list of URLs from an external file. The URLs format usually is
                         http://[URL]?[something]=
-  -L INPUT_URL_FILE, --list-URLs INPUT_URL_FILE
-                        Input a list of URLs from an external file. The URLs
-                        format usually is http://[URL]?[something]=
   -c, --crawl           use the crawler to test all the endpoints
   -v, --verbose         Increase output verbosity
   -o [OUTFILE], --output [OUTFILE]
                         The file to save the results
-  -p, --enable-proxies  Enable proxy redirection. Default proxies are free and
-                        you can change them. If you don't want the default
-                        proxies you can supply your own and this option will
-                        be overrided! Note that the proxies will be picked at
-                        random for each request
+  --creds [user:pass]   The credentials to login
+  -p, --enable-proxies  Enable proxy redirection. Default proxies are free and you can change them. If you don't want
+                        the default proxies you can supply your own and this option will be overrided! Note that the
+                        proxies will be picked at random for each request
 
 Proxies in the list must be in the following format: protocol://{proxyip} 
 username:password (newline). If you dont have a authenticated 
@@ -68,8 +64,9 @@ proxy then skip the username:password entry and go for a new line
 Examples: 
             LFITester.py -u http://URL?smt= = test one specific endpoint
             LFITester.py -L test.txt = test a list of endpoints from file
-            LFITester.py -c -u http://URL = crawl and test all endpoints that URL
+            LFITester.py -c -u http://URL = crawl and test all endpoints of that URL
             LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file
+            LFITester.py --creds abc:abc -u http://URL?smt= = test one specific endpoint which requires a login
 
 ```
 
