@@ -15,7 +15,7 @@ It runs in Linux/Unix systems but it can run on windows as well. In order to use
 
 • You will also need pip which if you don't have just run ```sudo apt install python3-pip``` for linux.
 
-• Download the program or clone the repository in your system `git clone https://github.com/Kostasssss/LFITester.git`
+• Download the program or clone the repository in your system `git clone https://github.com/kostas-pa/LFITester.git`
 
 • Go to the LFITester folder
 
