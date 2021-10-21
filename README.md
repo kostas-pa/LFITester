@@ -70,7 +70,7 @@ Examples:
 
 ```
 
-• Basic Usage: `python3 LFITester.py -v -u http://myvulnerabledomain/vulnerable/application?test_param=`
+• Basic Usage: `python3 LFITester.py -v -u "http://myvulnerabledomain/vulnerable/application?test_param="`
 
 # Sidenote
 • If you like this project please consider giving it a star
