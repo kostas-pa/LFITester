@@ -62,11 +62,11 @@ username:password (newline). If you dont have a authenticated
 proxy then skip the username:password entry and go for a new line
 
 Examples: 
-            LFITester.py -u http://URL?smt= = test one specific endpoint
+            LFITester.py -u "http://URL?smt=" = test one specific endpoint
             LFITester.py -L test.txt = test a list of endpoints from file
-            LFITester.py -c -u http://URL = crawl and test all endpoints of that URL
+            LFITester.py -c -u "http://URL" = crawl and test all endpoints of that URL
             LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file
-            LFITester.py --creds abc:abc -u http://URL?smt= = test one specific endpoint which requires a login
+            LFITester.py --creds abc:abc -u "http://URL?smt=" = test one specific endpoint which requires a login
 
 ```
 
