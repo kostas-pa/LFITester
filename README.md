@@ -23,7 +23,7 @@ It runs in Linux/Unix systems but it can run on windows as well. In order to use
 
 • Then run ```pip3 install -r requirements.txt``` and ```sudo ./setup.sh```
 
-• After that you can simply run LFITester as a command.
+• After that you can simply run lfitester as a command.
 
 ```
 $python3 LFITester.py 
