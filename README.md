@@ -1,3 +1,6 @@
+[![Python 3](https://img.shields.io/badge/Python-3-blue.svg)](https://www.python.org/downloads/)
+[![MIT License](https://img.shields.io/badge/License-MIT-red.svg)](LICENSE)
+
 # DISCLAIMER
 • This tool is for educational purpuses only.
 
