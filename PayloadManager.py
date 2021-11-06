@@ -1,8 +1,6 @@
 import re
 import requests
 import urllib
-import git
-import pathlib
 from UAList import fetchUA, fetchAgent
 from urllib.parse import quote
 from urllib.request import urlopen
@@ -44,20 +42,6 @@ class Payload:
 			self.updatee()
 			self.Attack()
 
-
-
-
-	def updatee(self):
-		print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')
-		# Get current path of the directory
-		cwd = pathlib.Path().resolve()
-		# Find the repo of the program
-		repo = git.Repo(cwd)
-		# Stash any changes done locally so as to not have any problem the pull request
-		repo.git.stash()
-		# Git pull to do the update
-		repo.remotes.origin.pull()
-		print(colored('[+]', 'green', attrs=['bold']) + ' Updated successfully')
 
 
 
