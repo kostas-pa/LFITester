@@ -94,10 +94,6 @@ class Payload:
 			else:
 				print(colored(str(ret.status_code) + " - DEAD", 'red'))
 				return False	
-		except requests.exceptions.MissingSchema as schema:
-			print(colored(str(ret.status_code) + " - DEAD", 'red'))
-			print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
-			print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')			
 		except Exception as e:
 			print(colored(str(ret.status_code) + " - DEAD", 'red'))
 			print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
