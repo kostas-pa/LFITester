@@ -39,7 +39,6 @@ class Payload:
 
 		self.proxies = proxies
 		if initiate:
-			self.updatee()
 			self.Attack()
 
 

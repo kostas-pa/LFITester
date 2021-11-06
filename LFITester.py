@@ -71,7 +71,7 @@ def updatee():
 	# Git pull to do the update
 	repo.remotes.origin.pull()
 	# Give execute permition to the main program after the update
-	cmd = '/usr/bin/chmod +x ' + cwd + '/LFITester.py'
+	cmd = '/usr/bin/chmod +x ' + str(cwd) + '/LFITester.py'
 	# execute the command
 	os.system(cmd)
 	print(colored('[+]', 'green', attrs=['bold']) + ' Updated successfully')	
