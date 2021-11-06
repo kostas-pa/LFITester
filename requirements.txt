@@ -1,5 +1,6 @@
-pyfiglet==0.8.post1
-lxml==4.4.1
-termcolor==1.1.0
+pyfiglet==0.8.post0
+lxml==4.6.3
 requests==2.25.1
 beautifulsoup4==4.10.0
+GitPython==3.1.24
+termcolor==1.1.0
