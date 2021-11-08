@@ -39,24 +39,23 @@ def main():
 				test_urls = webcrawler(arghandler.url, check, arghandler.creds)
 				for url in test_urls:
 					print(colored(f"Testing: {url}\n\n", 'green'))
-					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity)
+					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn)
 			else:
 				print(colored(f"Testing: {arghandler.url}\n\n", 'green'))
-				PayloadManager.Payload(arghandler.url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity)
+				PayloadManager.Payload(arghandler.url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn)
 		else:
 			if arghandler.crawler:
 				for url in arghandler.url:
 					test_urls = webcrawler(url, check, arghandler.creds)
 					for endpoint in test_urls:
 						print(colored(f"Testing: {endpoint}\n\n", 'green'))
-						PayloadManager.Payload(endpoint, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity)
+						PayloadManager.Payload(endpoint, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn)
 			else:
 				for url in arghandler.url:
 					print(colored(f"Testing: {url}\n\n", 'green'))
-					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity)
+					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn)
 	except KeyboardInterrupt:
 		print('\nGracefully Exiting...\n')
-
 
 
 

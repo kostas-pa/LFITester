@@ -24,6 +24,7 @@ class ArgumentHandler:
         self.enable_proxies = args.enabled_proxies
         self.outfile = args.outfile
         self.creds = args.creds
+        self.autopwn = args.autopwn
 
     def printBanner(self):
         printBannerPadding('*')
@@ -49,4 +50,5 @@ Examples:
         parser.add_argument('-o', '--output', nargs='?', dest="outfile", help='The file to save the results', type=argparse.FileType('w'))
         parser.add_argument('--creds', nargs='?', dest="creds", metavar='user:pass', help='The credentials to login', type=str)
         parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="""Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overridden! Note that the proxies will be picked at random for each request""")
+        parser.add_argument('--autopwn', dest='autopwn', metavar='IP', help="If the webapp is vulnerable to LFI then it will attempt to exploit it and give back a shell. This option requires your IP in order to connect with the revshell")
         return parser
