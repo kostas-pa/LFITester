@@ -48,5 +48,5 @@ Examples:
         parser.add_argument('-v', '--verbose', action='count', help='Increase output verbosity', default=0)
         parser.add_argument('-o', '--output', nargs='?', dest="outfile", help='The file to save the results', type=argparse.FileType('w'))
         parser.add_argument('--creds', nargs='?', dest="creds", metavar='user:pass', help='The credentials to login', type=str)
-        parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="""Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overrided! Note that the proxies will be picked at random for each request""")
+        parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="""Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overridden! Note that the proxies will be picked at random for each request""")
         return parser
