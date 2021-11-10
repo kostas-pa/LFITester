@@ -28,7 +28,7 @@ def main():
 			check = True
 		else:
 			check = False
-		#updatee()
+		updatee()
 		if arghandler.enable_proxies:
 			print(colored("Detected Enabled Proxies. Setting up proxy list...",'green'))
 			clean_proxies()

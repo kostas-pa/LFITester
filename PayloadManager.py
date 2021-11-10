@@ -271,7 +271,6 @@ class Payload:
 
 	def logPoisonCheck(self):
 		headers = {"User-Agent": self.payload}
-		print(headers)
 		response = requests.get(self.url, headers=headers)
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
