@@ -2,7 +2,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-red.svg)](LICENSE)
 
 # DISCLAIMER
-• This tool is for educational purpuses only.
+• This tool is for educational purposes only.
 
 • We are not responsible for any illegal usage of this tool.
 
