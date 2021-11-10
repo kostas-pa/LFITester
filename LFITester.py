@@ -28,7 +28,7 @@ def main():
 			check = True
 		else:
 			check = False
-		updatee()
+		#updatee()
 		if arghandler.enable_proxies:
 			print(colored("Detected Enabled Proxies. Setting up proxy list...",'green'))
 			clean_proxies()
@@ -39,21 +39,21 @@ def main():
 				test_urls = webcrawler(arghandler.url, check, arghandler.creds)
 				for url in test_urls:
 					print(colored(f"Testing: {url}\n\n", 'green'))
-					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn)
+					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode)
 			else:
 				print(colored(f"Testing: {arghandler.url}\n\n", 'green'))
-				PayloadManager.Payload(arghandler.url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn)
+				PayloadManager.Payload(arghandler.url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode)
 		else:
 			if arghandler.crawler:
 				for url in arghandler.url:
 					test_urls = webcrawler(url, check, arghandler.creds)
 					for endpoint in test_urls:
 						print(colored(f"Testing: {endpoint}\n\n", 'green'))
-						PayloadManager.Payload(endpoint, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn)
+						PayloadManager.Payload(endpoint, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode)
 			else:
 				for url in arghandler.url:
 					print(colored(f"Testing: {url}\n\n", 'green'))
-					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn)
+					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode)
 	except KeyboardInterrupt:
 		print('\nGracefully Exiting...\n')
 

