@@ -42,16 +42,16 @@ class ArgumentHandler:
 
     def update(self):
         print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')
-        # Get current path of the directory
-        cwd = pathlib.Path().resolve()
+        # Get path of the directory of the repo
+        repo_path = os.path.dirname(__file__)
         # Find the repo of the program
-        repo = git.Repo(cwd)
+        repo = git.Repo(repo_path)
         # Stash any changes done locally so as to not have any problem the pull request
         repo.git.stash()
         # Git pull to do the update
         repo.remotes.origin.pull()
         # Give execute permition to the main program after the update
-        cmd = '/usr/bin/chmod +x ' + str(cwd) + '/LFITester.py'
+        cmd = '/usr/bin/chmod +x ' + str(repo_path) + '/LFITester.py'
         # execute the command
         os.system(cmd)
         print(colored('[+]', 'green', attrs=['bold']) + ' Updated successfully')
