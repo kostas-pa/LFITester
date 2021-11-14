@@ -321,6 +321,6 @@ class Payload:
 				return False
 			return rce
 		else:
-			print(colored('[-]', 'red', attrs=['bold']) + " The server type " + url.getheader('Server') + " is not supported!!!")
+			print(colored('[-]', 'red', attrs=['bold']) + " The server type " + response.headers['Server'] + " is not supported!!!")
 		return False
 
