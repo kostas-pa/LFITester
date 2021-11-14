@@ -9,12 +9,9 @@ from ArgumentHandler import ArgumentHandler
 from termcolor import colored
 import PayloadManager
 import sys
-import git
-import os
 from pyfiglet import Figlet
 from proxies_list import clean_proxies
 from Crawler import webcrawler
-import pathlib
 	
 def main():
 	try:
@@ -28,7 +25,7 @@ def main():
 			check = True
 		else:
 			check = False
-		updatee()
+		#updatee() #Remove AutoUpdate cause it's inneficient. 
 		if arghandler.enable_proxies:
 			print(colored("Detected Enabled Proxies. Setting up proxy list...",'green'))
 			clean_proxies()
@@ -39,41 +36,24 @@ def main():
 				test_urls = webcrawler(arghandler.url, check, arghandler.creds)
 				for url in test_urls:
 					print(colored(f"Testing: {url}\n\n", 'green'))
-					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode)
+					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force)
 			else:
 				print(colored(f"Testing: {arghandler.url}\n\n", 'green'))
-				PayloadManager.Payload(arghandler.url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode)
+				PayloadManager.Payload(arghandler.url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force)
 		else:
 			if arghandler.crawler:
 				for url in arghandler.url:
 					test_urls = webcrawler(url, check, arghandler.creds)
 					for endpoint in test_urls:
 						print(colored(f"Testing: {endpoint}\n\n", 'green'))
-						PayloadManager.Payload(endpoint, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode)
+						PayloadManager.Payload(endpoint, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force)
 			else:
 				for url in arghandler.url:
 					print(colored(f"Testing: {url}\n\n", 'green'))
-					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode)
+					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force)
 	except KeyboardInterrupt:
 		print('\nGracefully Exiting...\n')
 
-
-
-def updatee():
-	print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')
-	# Get current path of the directory
-	cwd = pathlib.Path().resolve()
-	# Find the repo of the program
-	repo = git.Repo(cwd)
-	# Stash any changes done locally so as to not have any problem the pull request
-	repo.git.stash()
-	# Git pull to do the update
-	repo.remotes.origin.pull()
-	# Give execute permition to the main program after the update
-	cmd = '/usr/bin/chmod +x ' + str(cwd) + '/LFITester.py'
-	# execute the command
-	os.system(cmd)
-	print(colored('[+]', 'green', attrs=['bold']) + ' Updated successfully')	
 	
 	
 if __name__ == '__main__':
