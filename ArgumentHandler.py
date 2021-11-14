@@ -1,6 +1,9 @@
 import argparse
 from bannermagic import printBannerPadding, printMessage
 from argparse import RawDescriptionHelpFormatter
+import pathlib
+import git
+import os
 
 class ArgumentHandler:
 
@@ -8,6 +11,9 @@ class ArgumentHandler:
         self.printBanner()
         self.parser = self.ConfigureParser()
         args = self.parser.parse_args()
+
+        if args.update:
+            update()
         self.verbosity = args.verbose
         if args.input_url:
             self.url = args.input_url
@@ -26,9 +32,26 @@ class ArgumentHandler:
         self.creds = args.creds
         self.autopwn = args.autopwn
         self.mode = args.mode
-
+        
+        self.force = args.force
         if self.mode == None:
             self.mode = 0
+
+    def update(self):
+        print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')
+        # Get current path of the directory
+        cwd = pathlib.Path().resolve()
+        # Find the repo of the program
+        repo = git.Repo(cwd)
+        # Stash any changes done locally so as to not have any problem the pull request
+        repo.git.stash()
+        # Git pull to do the update
+        repo.remotes.origin.pull()
+        # Give execute permition to the main program after the update
+        cmd = '/usr/bin/chmod +x ' + str(cwd) + '/LFITester.py'
+        # execute the command
+        os.system(cmd)
+        print(colored('[+]', 'green', attrs=['bold']) + ' Updated successfully')
 
     def printBanner(self):
         printBannerPadding('*')
@@ -107,4 +130,8 @@ Examples:
         parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="""Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overridden! Note that the proxies will be picked at random for each request""")
         parser.add_argument('--autopwn', dest='autopwn', metavar='IP', help="If the webapp is vulnerable to LFI then it will attempt to exploit it and give back a shell. This option requires your IP in order to connect with the revshell", type=str)
         parser.add_argument('-m', '--mode', dest='mode', metavar='Payload', help='Select the payload that suits best. Try different ones if the exploit doesn\'t work.', type=int)
+        parser.add_argument('-f', '--force', dest='force', help="Treat endpoint as alive even if it returns 404")
+        parser.add_argument('-u', '--update', dest='update', help="Update LFITester")
         return parser
+
+
