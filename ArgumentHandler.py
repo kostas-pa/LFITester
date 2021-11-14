@@ -4,6 +4,8 @@ from argparse import RawDescriptionHelpFormatter
 import pathlib
 import git
 import os
+from termcolor import colored
+
 
 class ArgumentHandler:
 
@@ -13,7 +15,7 @@ class ArgumentHandler:
         args = self.parser.parse_args()
 
         if args.update:
-            update()
+            self.update()
             exit()
         self.verbosity = args.verbose
         if args.input_url:
