@@ -15,7 +15,7 @@ import pathlib
 
 class Payload:
 
-	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, Force=False):
+	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, force=False):
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
@@ -41,7 +41,7 @@ class Payload:
 
 		self.proxies = proxies
 		if initiate:
-			self.Attack(attempt_shell, mode, Force)
+			self.Attack(attempt_shell, mode, force)
 
 
 
@@ -54,7 +54,7 @@ class Payload:
 
 
 	def Attack(self, attempt_shell=False, mode=0, force=False):
-		if force and self.urlCheck():
+		if not force and not self.urlCheck():
 			return
 		self.dirTraversalCheck()
 		headerres = self.headerCheck()
