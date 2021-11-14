@@ -14,6 +14,7 @@ class ArgumentHandler:
 
         if args.update:
             update()
+            exit()
         self.verbosity = args.verbose
         if args.input_url:
             self.url = args.input_url
@@ -130,8 +131,8 @@ Examples:
         parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="""Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overridden! Note that the proxies will be picked at random for each request""")
         parser.add_argument('--autopwn', dest='autopwn', metavar='IP', help="If the webapp is vulnerable to LFI then it will attempt to exploit it and give back a shell. This option requires your IP in order to connect with the revshell", type=str)
         parser.add_argument('-m', '--mode', dest='mode', metavar='Payload', help='Select the payload that suits best. Try different ones if the exploit doesn\'t work.', type=int)
-        parser.add_argument('-f', '--force', dest='force', help="Treat endpoint as alive even if it returns 404")
-        parser.add_argument('-u', '--update', dest='update', help="Update LFITester")
+        parser.add_argument('-f', '--force', dest='force', help="Treat endpoint as alive even if it returns 404", action='store_true')
+        parser.add_argument('--update', dest='update', help="Update LFITester", action='store_true')
         return parser
 
 
