@@ -12,6 +12,7 @@ import sys
 from pyfiglet import Figlet
 from proxies_list import clean_proxies
 from Crawler import webcrawler
+import os
 	
 def main():
 	try:
@@ -53,6 +54,7 @@ def main():
 					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force)
 	except KeyboardInterrupt:
 		print('\nGracefully Exiting...\n')
+		os._exit(0)
 
 	
 	
