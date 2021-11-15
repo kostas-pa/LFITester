@@ -57,10 +57,10 @@ class Payload:
 		time.sleep(2)
 		if not self.conn:
 			print(colored("[-]", 'red') + " Exploit completed but no sessions were created!")
-			print(colored("Do you want to try other payloads? (Y/n)", 'yellow'), end='')
+			print(colored("Do you want to try other payloads? (Y/n) ", 'yellow'), end='')
 			ans = str(input())
-			if not ans or ans.lower() == 'n':
-				exit()
+			if 'n' in ans.lower():
+				os._exit(0)
 			session = False
 			for payload in self.payloads:
 				print(colored("[*]", 'yellow') + " Trying: " + payload)
@@ -73,7 +73,7 @@ class Payload:
 
 			if not session:
 				print(colored('[-]','red') + ' No payload worked. Exiting...')
-				exit()
+				os._exit(0)
 
 	def GetPayloads(self, ip, port):
 		cwd = os.path.dirname(__file__)
