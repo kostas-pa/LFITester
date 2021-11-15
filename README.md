@@ -138,10 +138,6 @@ Coding Autopwn. Can be unstable. This feature is under development and testing.
 
 • If you are user and you get an error about Git then try to run lfitester with the sudo command like so **sudo lfitester [flags]**
 
-# To-Do
-1) Fix the cwd bug on update.
-2) Add a timer on the payload trigger
-
 # Sidenote
 • If you like this project please consider giving it a star
 
