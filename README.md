@@ -28,23 +28,24 @@ It runs in Linux/Unix systems but it can run on windows as well. In order to use
 
 • After that you can simply run lfitester as a command.
 
+• It is recommended to run the **--update** flag before initiating an attack 
+
 ```
 $python3 LFITester.py 
- _      ______ _____ _______        _                                                           
-| |    |  ____|_   _|__   __|      | |                                                          
-| |    | |__    | |    | | ___  ___| |_ ___ _ __                                                
-| |    |  __|   | |    | |/ _ \/ __| __/ _ \ '__|                                               
-| |____| |     _| |_   | |  __/\__ \ ||  __/ |                                                  
-|______|_|    |_____|  |_|\___||___/\__\___|_|                                                  
-                                                                                                
-                                                                                                
+ _      ______ _____ _______        _                                                                                                                                                        
+| |    |  ____|_   _|__   __|      | |                                                                                                                                                       
+| |    | |__    | |    | | ___  ___| |_ ___ _ __                                                                                                                                             
+| |    |  __|   | |    | |/ _ \/ __| __/ _ \ '__|                                                                                                                                            
+| |____| |     _| |_   | |  __/\__ \ ||  __/ |                                                                                                                                               
+|______|_|    |_____|  |_|\___||___/\__\___|_|                                                                                                                                               
+                                                                                                                                                                                             
+                                                                                                                                                                                             
 
-************************************************************************************************
-                                           LFITester
-                                     Automated LFI Testing
-************************************************************************************************
-usage: LFITester.py [-h] [-u URL] [-L URL_File] [-c] [-v] [-o [OUTFILE]] [--creds [user:pass]]
-                    [-p] [--autopwn IP] [-m Payload]
+*********************************************************************************************************************************************************************************************
+                                                                                          LFITester
+                                                                                    Automated LFI Testing
+*********************************************************************************************************************************************************************************************
+usage: LFITester.py [-h] [-u URL] [-L URL_File] [-c] [-v] [-o [OUTFILE]] [--creds [user:pass]] [-p] [--autopwn IP] [-m Payload] [-f] [--update]
 
         Payload Modes:
         0:  Simple bash TCP
@@ -100,23 +101,19 @@ optional arguments:
   -h, --help            show this help message and exit
   -u URL, --url URL     The url to test. The URL usually is http://[URL]?[something]=
   -L URL_File, --list-url URL_File
-                        Input a list of URLs from an external file. The URLs format usually is
-                        http://[URL]?[something]=
+                        Input a list of URLs from an external file. The URLs format usually is http://[URL]?[something]=
   -c, --crawl           use the crawler to test all the endpoints
   -v, --verbose         Increase output verbosity
   -o [OUTFILE], --output [OUTFILE]
                         The file to save the results
   --creds [user:pass]   The credentials to login
-  -p, --enable-proxies  Enable proxy redirection. Default proxies are free and you can change
-                        them. If you don't want the default proxies you can supply your own
-                        and this option will be overridden! Note that the proxies will be
-                        picked at random for each request
-  --autopwn IP          If the webapp is vulnerable to LFI then it will attempt to exploit it
-                        and give back a shell. This option requires your IP in order to
-                        connect with the revshell
+  -p, --enable-proxies  Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be
+                        overridden! Note that the proxies will be picked at random for each request
+  --autopwn IP          If the webapp is vulnerable to LFI then it will attempt to exploit it and give back a shell. This option requires your IP in order to connect with the revshell
   -m Payload, --mode Payload
-                        Select the payload that suits best. Try different ones if the exploit
-                        doesn't work.
+                        Select the payload that suits best. Try different ones if the exploit doesn't work.
+  -f, --force           Treat endpoint as alive even if it returns 404
+  --update              Update LFITester
 
 Proxies in the list must be in the following format: protocol://{proxyip} 
 username:password (newline). If you dont have a authenticated 
