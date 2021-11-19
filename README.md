@@ -136,9 +136,9 @@ Coding Autopwn. Can be unstable. This feature is under development and testing.
 # Common Issues
 • If you are having issues with a URL that has 2 parameters like http://url?param1=1&param2=2, try to run it with "" like so "http://url?param1=1&param2=2"
 
-• If you are user and you get an error about Git then try to run lfitester with the sudo command like so **sudo lfitester [flags]**
+• If you are user and you get an error about Git, then try to run lfitester with the sudo command like so **sudo lfitester [flags]**
 
-• If you are having issues with a library try running again ```sudo pip3 install -r requirements.txt``` as the requirements may have changed
+• If you are having issues with a library, try running again ```sudo pip3 install -r requirements.txt``` as the requirements may have changed
 
 # Sidenote
 • If you like this project please consider giving it a star
