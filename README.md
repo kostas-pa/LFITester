@@ -134,7 +134,7 @@ Examples:
 Coding Autopwn. Can be unstable. This feature is under development and testing.
 
 # Common Issues
-• If you are having issues with a URL that has 2 parameters like http://url?param1=1&param2=2, try to run it with "" like so "http://url?param1=1&param2=2"
+• If you are having issues with a URL that has 2 query parameters like http://url?param1=1&param2=2, try to run it with "" like so "http://url?param1=1&param2=2"
 
 • If you are user and you get an error about Git, then try to run lfitester with the sudo command like so **sudo lfitester [flags]**
 
