@@ -1,5 +1,5 @@
 [![Python 3](https://img.shields.io/badge/Python-3-blue.svg)](https://www.python.org/downloads/)
-[![GNU V3 License]https://img.shields.io/badge/License-GNUV3-red.svg)](LICENSE)
+[![GNU V3 License](https://img.shields.io/badge/License-GNUV3-red.svg)](LICENSE)
 
 # DISCLAIMER
 • This tool is for educational purposes only.
