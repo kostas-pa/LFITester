@@ -99,9 +99,9 @@ class Payload:
 
 
 	def autopwn(self, attempt_shell, cookieres, headerres, logres, mode=0):
-		
+		print(headerres)
 		payload = self.payloads[mode]
-		if cookieres or headerres or logres == False:
+		if not cookieres and not headerres and not logres:
 			print(colored("[-]",'red') + " No RCE Found. Autopwn impossible...")
 			return
 		print(colored("[+]", 'green') + " RCE Detected!")
