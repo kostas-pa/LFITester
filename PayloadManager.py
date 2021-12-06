@@ -190,9 +190,9 @@ class Payload:
 
 			
 	# Strips all HTML tags from the HTTP response	
-	def stripHtmlTags(self, t):
+	def stripHtmlTags(self, tag):
 		htmlchars = re.compile('<.*?>')
-		clean = re.sub(htmlchars, '', t)
+		clean = re.sub(htmlchars, '', tag)
 		return clean
 
 
