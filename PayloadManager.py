@@ -259,13 +259,13 @@ class Payload:
 								base = base64.b64decode(wo).decode()
 							except Exception as e:
 								continue
-					if base.__contains__('<?php') or base.__contains__('<script'):
-						print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
-						if self.outfile is not None:
-							self.outfile.write('[+] Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
-					else:
-						if self.verbosity > 0:
-							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
+						if base.__contains__('<?php') or base.__contains__('<script'):
+							print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
+							if self.outfile is not None:
+								self.outfile.write('[+] Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
+						else:
+							if self.verbosity > 0:
+								print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
 			else:	
 				if self.verbosity > 0:
 					print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
