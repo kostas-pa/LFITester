@@ -152,8 +152,8 @@ class Payload:
 		except URLError as e:
    			print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ' + e.reason)
    		except http.client.RemoteDisconnected as e:
-   			print(colored('[-]','red', attrs['bold']) + ' Reason: ' +  e.reason + "\nAborting...")
-   			exit()
+   			print(colored('[-]','red', attrs['bold']) + ' Reason: ' +  e.reason + "\nAborting endpoint...")
+
 
 
 
