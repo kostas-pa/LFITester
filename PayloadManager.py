@@ -148,10 +148,10 @@ class Payload:
 			return self.stripHtmlTags(response)
 		
 		except HTTPError as e:
-    		print(colored('[-]', 'red', attrs=['bold']) + ' Error code: ' + e.code)		
+			print(colored('[-]', 'red', attrs=['bold']) + ' Error code: ' + e.code)		
 		except URLError as e:
-   			print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ' + e.reason)
-   		except http.client.RemoteDisconnected as e:
+			print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ' + e.reason)
+		except http.client.RemoteDisconnected as e:
    			print(colored('[-]','red', attrs['bold']) + ' Reason: ' +  e.reason + "\nAborting endpoint...")
 
 
