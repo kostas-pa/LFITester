@@ -148,11 +148,11 @@ class Payload:
 			return self.stripHtmlTags(response)
 		
 		except HTTPError as e:
-			print(colored('[-]', 'red', attrs=['bold']) + ' Error code: ' + e.code)		
+			print(colored('[-]', 'red', attrs=['bold']) + ' Error code: ' + str(e))		
 		except URLError as e:
-			print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ' + e.reason)
+			print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ' + str(e))
 		except http.client.RemoteDisconnected as e:
-   			print(colored('[-]','red', attrs['bold']) + ' Reason: ' +  e.reason + "\nAborting endpoint...")
+   			print(colored('[-]','red', attrs['bold']) + ' Reason: ' +  str(e) + "\nAborting endpoint...")
 
 
 
@@ -174,6 +174,10 @@ class Payload:
 			else:
 				print(colored(str(ret.status_code) + " - DEAD", 'red'))
 				return False	
+		except requests.exceptions.ConnectionError as e:
+			print(colored('[-] Endpoint DEAD', 'red'))
+			print(colored('[-] Failed with error: ', 'red') + str(e))
+			return False
 		except Exception as e:
 			print(colored(str(ret.status_code) + " - DEAD", 'red'))
 			print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
