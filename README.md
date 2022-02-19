@@ -32,20 +32,21 @@ It runs in Linux/Unix systems but it can run on windows as well. In order to use
 
 ```
 $python3 LFITester.py 
- _      ______ _____ _______        _                                                                                                                                                        
-| |    |  ____|_   _|__   __|      | |                                                                                                                                                       
-| |    | |__    | |    | | ___  ___| |_ ___ _ __                                                                                                                                             
-| |    |  __|   | |    | |/ _ \/ __| __/ _ \ '__|                                                                                                                                            
-| |____| |     _| |_   | |  __/\__ \ ||  __/ |                                                                                                                                               
-|______|_|    |_____|  |_|\___||___/\__\___|_|                                                                                                                                               
-                                                                                                                                                                                             
-                                                                                                                                                                                             
+└──╼ $./LFITester.py 
+ _      ______ _____ _______        _            
+| |    |  ____|_   _|__   __|      | |           
+| |    | |__    | |    | | ___  ___| |_ ___ _ __ 
+| |    |  __|   | |    | |/ _ \/ __| __/ _ \ '__|
+| |____| |     _| |_   | |  __/\__ \ ||  __/ |   
+|______|_|    |_____|  |_|\___||___/\__\___|_|   
+                                                 
+                                                 
 
-*********************************************************************************************************************************************************************************************
+**********************************************************************************************************************************************************************************************
                                                                                           LFITester
                                                                                     Automated LFI Testing
-*********************************************************************************************************************************************************************************************
-usage: LFITester.py [-h] [-u URL] [-L URL_File] [-c] [-v] [-o [OUTFILE]] [--creds [user:pass]] [-p] [--autopwn IP] [-m Payload] [-f] [--update]
+**********************************************************************************************************************************************************************************************
+usage: LFITester.py [-h] [-u URL] [-L URL_File] [-c] [-v] [-o [OUTFILE]] [--creds [user:pass]] [-p] [--autopwn IP] [-m Payload] [-f] [--update] [--batch-ans BATCH] [-s]
 
         Payload Modes:
         0:  Simple bash TCP
@@ -114,6 +115,8 @@ optional arguments:
                         Select the payload that suits best. Try different ones if the exploit doesn't work.
   -f, --force           Treat endpoint as alive even if it returns 404
   --update              Update LFITester
+  --batch-ans BATCH     Answer all yes/no
+  -s, --stealth         Enable stealth mode
 
 Proxies in the list must be in the following format: protocol://{proxyip} 
 username:password (newline). If you dont have a authenticated 
@@ -125,6 +128,9 @@ Examples:
             LFITester.py -c -u "http://URL" = crawl and test all endpoints of that URL
             LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file
             LFITester.py --creds abc:abc -u "http://URL?smt=" = test one specific endpoint which requires a login
+
+Developers: Konstantinos Papanagnou ( https://github.com/Konstantinos-Papanagnou )
+            Konstantinos Pantazis   ( https://github.com/kostas-pa )
 
 ```
 
