@@ -10,6 +10,7 @@ from proxies_list import fetch_proxy
 from requests.auth import HTTPBasicAuth
 from pwn import listen
 import threading
+import random
 import time
 import pathlib
 import os
@@ -141,6 +142,8 @@ class Payload:
 
 	# It sends the url as is without decoding it first, so that it can bypass filters that look for ..
 	def hit(self, url):
+		if self.stealth:
+			time.sleep(random.randint(2,6)) # Sleep for a random interval of seconds (between 2 and 6) per request to be more stealthy
 		if self.proxies:
 			proxy_support = urllib.request.ProxyHandler(fetch_proxy())
 			opener = urllib.request.build_opener(proxy_support)
