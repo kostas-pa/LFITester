@@ -40,6 +40,17 @@ class ArgumentHandler:
         if self.mode == None:
             self.mode = 0
 
+        self.stealth = args.stealth
+        if args.batch != None:
+            if args.batch.lower() == 'yes':
+                self.batch = True
+            elif args.batch.lower() == 'no':
+                self.batch = False
+            else:
+                self.batch = None
+        else:
+            self.batch = None
+
     def update(self):
         print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')
         # Get path of the directory of the repo
@@ -135,6 +146,8 @@ Examples:
         parser.add_argument('-m', '--mode', dest='mode', metavar='Payload', help='Select the payload that suits best. Try different ones if the exploit doesn\'t work.', type=int)
         parser.add_argument('-f', '--force', dest='force', help="Treat endpoint as alive even if it returns 404", action='store_true')
         parser.add_argument('--update', dest='update', help="Update LFITester", action='store_true')
+        parser.add_argument('--batch-ans', dest='batch', help="Answer all yes/no", type=str)
+        parser.add_argument('-s', '--stealth', dest='stealth', help='Enable stealth mode', action='store_true')
         return parser
 
 
