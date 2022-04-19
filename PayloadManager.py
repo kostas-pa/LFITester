@@ -169,14 +169,16 @@ class Payload:
 
 	# Checks if the url is valid
 	def urlCheck(self):
+		# Extract the domain with protocol from the provided url
+		self.domain = urllib.parse.urlparse(self.url).scheme + '://' + urllib.parse.urlparse(self.url).netloc
 		try:
 			print("Checking Remote Server Health")
 			if self.proxies:
-				ret = requests.get(self.url, headers=fetchUA(), proxies=fetch_proxy(), verify=False)
+				ret = requests.get(self.domain, headers=fetchUA(), proxies=fetch_proxy(), verify=False)
 			elif self.creds is not None:
 				ret = self.cred(self.url)
 			else:
-				ret = requests.get(self.url, headers=fetchUA(), verify=False)
+				ret = requests.get(self.domain, headers=fetchUA(), verify=False)
 			if ret.status_code == 200:
 				print(colored(str(ret.status_code) +" - OK",'green'))
 				return True
