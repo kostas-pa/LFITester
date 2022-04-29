@@ -274,6 +274,7 @@ class Payload:
 						if word.__contains__(c):
 							wordd = word.strip("b'").replace(c, "")
 							wo = wordd.replace("\\t", "")
+							# All the above will sctrip all the new lines and extra characters
 							try:
 								base = base64.b64decode(wo).decode()
 							except Exception as e:
@@ -285,6 +286,18 @@ class Payload:
 							else:
 								if self.verbosity > 0:
 									print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
+					# This try is in case the base64 doesn't contain any new lines because otherwise it will be skipped
+					try:
+						base = base64.b64decode(word).decode()
+					except Exception as e:
+						continue
+					if base.__contains__('<?php') or base.__contains__('<script'):
+						print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
+						if self.outfile is not None:
+							self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
+					else:
+						if self.verbosity > 0:
+							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
 			else:	
 				if self.verbosity > 0:
 					print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
