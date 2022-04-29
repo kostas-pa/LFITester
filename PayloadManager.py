@@ -229,7 +229,7 @@ class Payload:
 				if 'root:x' in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
 					if self.outfile is not None:
-						self.outfile.write('[+] Directory traversal found with ' + compUrl + '\n')
+						self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl + '\n')
 				else:
 					if self.verbosity > 0:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
@@ -248,7 +248,7 @@ class Payload:
 			if 'uid=' in clean.lower():
 				print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl)
 				if self.outfile is not None:
-					self.outfile.write('[+] Remote code execution (RCE) found with ' + compUrl + '\n')
+					self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl + '\n')
 				rce.append(compUrl)
 			else:
 				if self.verbosity > 0:
@@ -281,7 +281,7 @@ class Payload:
 							if base.__contains__('<?php') or base.__contains__('<script'):
 								print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
 								if self.outfile is not None:
-									self.outfile.write('[+] Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
+									self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
 							else:
 								if self.verbosity > 0:
 									print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
@@ -312,7 +312,7 @@ class Payload:
 				if 'uid='  in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned')
 					if self.outfile is not None:
-						self.outfile.write('[+] Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned\n')
+						self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned\n')
 					rce.append(compUrl)
 				else:
 					if self.verbosity > 0:
@@ -380,7 +380,7 @@ class Payload:
 				if "uid=" in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)
 					if self.outfile is not None:
-						self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathth + '\n')
+						self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth + '\n')
 					rce.append(pathth)
 				else:
 					if self.verbosity > 0:
@@ -403,7 +403,7 @@ class Payload:
 				if "uid=" in clean.lower():
 					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
 					if self.outfile is not None:
-						self.outfile.write('[+] Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
+						self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
 					rce.append(pathh)
 				else:
 					if self.verbosity > 0:
