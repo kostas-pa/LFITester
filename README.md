@@ -28,7 +28,16 @@ It runs in Linux/Unix systems but it can run on windows as well. In order to use
 
 • After that you can simply run lfitester as a command.
 
-• It is recommended to run the **--update** flag before initiating an attack 
+• It is recommended to run the **--update** flag before initiating an attack
+
+# Supported Attacks
+
+- Path Traversal and bypasses (Null byte, encoding, Filter Bypasses)
+- PHP Filter
+- Remote Code Execution (RCE) through:
+   - Log Poisoning (Apache, Nginx)
+   - PHP Session Files
+   - PHP Wrappers
 
 ```
 $python3 LFITester.py 
@@ -136,8 +145,8 @@ Developers: Konstantinos Papanagnou ( https://github.com/Konstantinos-Papanagnou
 
 • Basic Usage: `python3 LFITester.py -v -u "http://myvulnerabledomain/vulnerable/application?test_param="`
 
-# New Features AUTOPWN
-Coding Autopwn. Can be unstable. This feature is under development and testing.
+# New Feature AUTOPWN
+- Automatically opens reverse shell if it finds RCE (see all the reverse shells in the description).
 
 # Common Issues
 • If you are having issues with a URL that has 2 query parameters like http://url?param1=1&param2=2, try to run it with "" like so "http://url?param1=1&param2=2"
@@ -145,6 +154,8 @@ Coding Autopwn. Can be unstable. This feature is under development and testing.
 • If you are user and you get an error about Git, then try to run lfitester with the sudo command like so **sudo lfitester [flags]**
 
 • If you are having issues with a library, try running the **--update** flag and then ```sudo pip3 install -r requirements.txt``` as the requirements may have changed
+
+• If you can't see the color in the output file but instead you see color codes, google ```[your text editor] display ANSI color codes```.
 
 # Sidenote
 • If you like this project please consider giving it a star
