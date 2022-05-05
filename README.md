@@ -146,7 +146,7 @@ Developers: Konstantinos Papanagnou ( https://github.com/Konstantinos-Papanagnou
 • Basic Usage: `python3 LFITester.py -v -u "http://myvulnerabledomain/vulnerable/application?test_param="`
 
 # New Feature AUTOPWN
-- Automatically opens reverse shell if it finds RCE (see all the reverse shells in the description).
+- Automatically opens a reverse shell if it finds RCE (see all the reverse shells in the description).
 
 # Common Issues
 • If you are having issues with a URL that has 2 query parameters like http://url?param1=1&param2=2, try to run it with "" like so "http://url?param1=1&param2=2"
