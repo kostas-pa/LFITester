@@ -136,8 +136,8 @@ Examples:
             LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file
             LFITester.py --creds abc:abc -u "http://URL?smt=" = test one specific endpoint which requires a login
 
-Developers: Konstantinos Papanagnou ( https://github.com/Konstantinos-Papanagnou )
-            Konstantinos Pantazis   ( https://github.com/kostas-pa )
+Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
+            Konstantinos Pantazis   (https://github.com/kostas-pa)
             ''', formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument('-u', '--url', dest="input_url", metavar='URL', help='The url to test. The URL usually is http://[URL]?[something]=')
         parser.add_argument('-L', '--list-url', dest="input_url_file", metavar='URL_File', help='Input a list of URLs from an external file. The URLs format usually is http://[URL]?[something]=', type=argparse.FileType('r'))
