@@ -143,7 +143,7 @@ Developers: Konstantinos Papanagnou ( https://github.com/Konstantinos-Papanagnou
 
 ```
 
-• Basic Usage: `python3 LFITester.py -v -u "http://myvulnerabledomain/vulnerable/application?test_param="`
+• Basic Usage: `python3 LFITester.py -u "http://myvulnerabledomain/vulnerable/application?test_param="`
 
 # New Feature AUTOPWN
 - Automatically opens a reverse shell if it finds RCE (see all the reverse shells in the description).
