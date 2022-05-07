@@ -24,7 +24,7 @@ It runs in Linux/Unix systems but it can run on windows as well. In order to use
 
 • First run the command ```sudo chmod +x setup.sh```
 
-• Then run ```sudo pip3 install -r requirements.txt``` and ```sudo ./setup.sh```
+• Then run ```sudo ./setup.sh``` which will autoinstall the required packages  
 
 • After that you can simply run lfitester as a command.
 
