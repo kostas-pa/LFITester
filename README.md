@@ -138,8 +138,8 @@ Examples:
             LFITester.py -c -L test.txt = crawl and test all endpoints for every URL in the file
             LFITester.py --creds abc:abc -u "http://URL?smt=" = test one specific endpoint which requires a login
 
-Developers: Konstantinos Papanagnou ( https://github.com/Konstantinos-Papanagnou )
-            Konstantinos Pantazis   ( https://github.com/kostas-pa )
+Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
+            Konstantinos Pantazis   (https://github.com/kostas-pa)
 
 ```
 
