@@ -148,7 +148,7 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
 # New Feature AUTOPWN
 - Automatically opens a reverse shell if it finds RCE (see all the reverse shells in the description).
 
-# Common Issues
+# ⚠️ Common Issues
 • If you are having issues with a URL that has 2 query parameters like http://url?param1=1&param2=2, try to run it with "" like so "http://url?param1=1&param2=2"
 
 • If you are user and you get an error about Git, then try to run lfitester with the sudo command like so **sudo lfitester [flags]**
