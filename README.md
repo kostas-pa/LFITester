@@ -162,4 +162,4 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
 • If you like this project please consider giving it a star
 
 # Credits
-• To [Konstantinos Pap](https://github.com/Konstantinos-Papanagnou) for assisting me with this project and for the knowledge he provided.
+• To [Konstantinos Pap](https://github.com/Konstantinos-Papanagnou) and to [Konstantinos Kanakis](https://github.com/c7c3r0) for assisting me with this project and for the knowledge they provided.
