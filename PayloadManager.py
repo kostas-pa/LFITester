@@ -151,7 +151,8 @@ class Payload:
 		if self.stealth:
 			time.sleep(random.randint(2,6)) # Sleep for a random interval of seconds (between 2 and 6) per request to be more stealthy
 		if self.proxies:
-			proxy_support = urllib.request.ProxyHandler(fetch_proxy())
+			proxy_support = threading.Thread(target=urllib.request.ProxyHandler, args=[fetch_proxy()])
+			proxy_support.start()
 			opener = urllib.request.build_opener(proxy_support)
 			urllib.request.install_opener(opener)
 		try:

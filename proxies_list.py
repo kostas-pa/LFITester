@@ -1,10 +1,14 @@
 import random
 import requests
+import os
 
+# get the installation directory so that the proxies can run from any location!
+dir_path = os.path.dirname(__file__)
+full_path = dir_path + '/proxies' # join the path with the file where the IPs of the proxies are
 
 def clean_proxies():
 	proxies = []
-	with open('proxies', 'r') as handle:
+	with open(full_path, 'r') as handle:
 		contents = handle.read().strip()
 		for proxy in contents.split('\n'):
 			proxies.append(proxy)
@@ -12,11 +16,12 @@ def clean_proxies():
 	print(proxies)
 	for proxy in proxies:
 		try:
-			response = requests.get('https://google.com', proxies={'https':'https://'+proxy}, timeout=8, verify=False)
+			response = requests.get('http://google.com', proxies={'http':'http://'+proxy}, timeout=8, verify=False)
 			proxy2.append(proxy)
 		except requests.exceptions.ConnectTimeout:
 			print(f'[-]\tProxy: {proxy} is taking too long to respond. Removing from the list...')
-		except requests.exceptions.ProxyError:
+		except requests.exceptions.ProxyError as e:
+			print(e)
 			print(f'[-]\tProxy: {proxy} is dead. Removing from the list...')
 	proxies = proxy2
 	if len(proxies) == 0:
@@ -29,7 +34,7 @@ def clean_proxies():
 
 def fetch_proxy():
 	proxies = []
-	with open('proxies', 'r') as handle:
+	with open(full_path, 'r') as handle:
 		contents = handle.read().strip()
 		for proxy in contents.split('\n'):
 			proxies.append(proxy)

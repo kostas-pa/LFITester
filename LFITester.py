@@ -3,7 +3,7 @@
 # CAUTION this script doesn't check for Remote File Inclusion (RFI)
 
 # DISCLAIMER
-# ONLY test this in a server you have permission to do it!!!!!!!
+# ONLY test this on a server you have permission to do it!!!!!!!
 
 from ArgumentHandler import ArgumentHandler
 from termcolor import colored
@@ -13,6 +13,7 @@ from pyfiglet import Figlet
 from proxies_list import clean_proxies
 from Crawler import webcrawler
 import os
+import threading
 	
 def main():
 	try:
@@ -25,11 +26,12 @@ def main():
 		if arghandler.creds is not None:
 			check = True
 		else:
-			check = False
-		#updatee() #Remove AutoUpdate cause it's inneficient. 
+			check = False 
 		if arghandler.enable_proxies:
 			print(colored("Detected Enabled Proxies. Setting up proxy list...",'green'))
-			clean_proxies()
+			proxyThread = threading.Thread(target=clean_proxies, args=[])
+			proxyThread.start()
+			proxyThread.join()
 		print(colored("This script doesn't check for Remote File Inclusion (RFI)", 'blue'))
 		print(colored("If it doesn't show any results that means it didn't find anything!!!", 'blue'))
 		if type(arghandler.url) is not list:
