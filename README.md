@@ -147,7 +147,7 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
 
 # New Feature AUTOPWN & Threading support
 - Automatically opens a reverse shell if it finds RCE (see all the reverse shells in the description).
-- Added threads to the attacks which speeds things up significantly!
+- Added threads to the attacks and to the proxies which speeds things up significantly!
 
 # ⚠️ Common Issues
 • If you are having issues with a URL that has 2 query parameters like http://url?param1=1&param2=2, try to run it with "" like so "http://url?param1=1&param2=2"
