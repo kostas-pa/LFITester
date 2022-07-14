@@ -20,8 +20,7 @@ def clean_proxies():
 			proxy2.append(proxy)
 		except requests.exceptions.ConnectTimeout:
 			print(f'[-]\tProxy: {proxy} is taking too long to respond. Removing from the list...')
-		except requests.exceptions.ProxyError as e:
-			print(e)
+		except requests.exceptions.ProxyError:
 			print(f'[-]\tProxy: {proxy} is dead. Removing from the list...')
 	proxies = proxy2
 	if len(proxies) == 0:
