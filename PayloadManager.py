@@ -348,6 +348,8 @@ class Payload:
 						return ret
 					# Otherwise hit Nginx Files and return the results no matter what they are
 					return self.hitNginx()
+				else:
+					os._exit(0)
 
 		# checks the type of the server
 		if "apache" in response.headers['Server'].lower():
