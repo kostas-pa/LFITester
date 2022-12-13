@@ -10,7 +10,7 @@
 
 # LFITester
 
-LFITester is a Python3 tool which tests if a server is vulnerable to Local File Inclusion (LFI) attack.
+LFITester is a Python3 tool which tests if a server is vulnerable to Local File Inclusion (LFI) attacks.
 
 It runs in Linux/Unix systems but it can run on windows as well. In order to use this program:
 
