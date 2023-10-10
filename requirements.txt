@@ -1,5 +1,5 @@
 beautifulsoup4==4.11.1
-GitPython==3.1.27
+GitPython==3.1.37
 lxml==4.8.0
 pwn==1.0
 pwntools==4.8.0
