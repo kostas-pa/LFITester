@@ -103,12 +103,12 @@ class Payload:
 		
 		dirThread = threading.Thread(target=self.dirTraversalCheck, args=[])
 		dirThread.start()
-		headerres = self.headerCheck() # if I put threading in this function it breaks!
 		filterThread = threading.Thread(target=self.filterCheck, args=[])
 		filterThread.start()
-		cookieres = threading.Thread(target=self.cookieCheck, args=[])
-		cookieres.start()
-		logres = self.logPoisonCheck() # if I put threading in this function it breaks!
+		# The following three are used for autopwn purposes. You can thread them but you need to join them before jumping into autopwn(). Won't do this at this point. It's fast in any case.
+		headerres = self.headerCheck()
+		cookieres = self.cookieCheck()
+		logres = self.logPoisonCheck()
 
 		if attempt_shell:
 			self.autopwn(attempt_shell, cookieres, headerres, logres, mode)
