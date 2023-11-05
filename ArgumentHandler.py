@@ -2,7 +2,10 @@ import argparse
 from bannermagic import printBannerPadding, printMessage
 from argparse import RawDescriptionHelpFormatter
 import pathlib
-import git
+try:
+    import git
+except ImportError:
+    print("There were issues importing git. Auto-update might fail...")
 import os
 from termcolor import colored
 
@@ -28,6 +31,15 @@ class ArgumentHandler:
                 self.url = lines
             else:
                 self.url = None
+
+        self.override_poc = False
+        self.poc = None
+        if args.poc:
+            lines = []
+            for line in args.poc:
+                lines.append(line.strip())
+            self.poc = lines
+            self.override_poc = True
        
         self.crawler = args.crawler
         self.enable_proxies = args.enabled_proxies
@@ -152,6 +164,7 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
         parser.add_argument('--update', dest='update', help="Update LFITester", action='store_true')
         parser.add_argument('--batch-ans', dest='batch', help="Answer all yes/no", type=str)
         parser.add_argument('-s', '--stealth', dest='stealth', help='Enable stealth mode', action='store_true')
+        parser.add_argument('--poc-file', dest='poc', help="Your custom poc file.", type=argparse.FileType('r'))
         return parser
 
 
