@@ -158,6 +158,8 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
 
 • If you can't see the color in the output file but instead you see color codes, google ```[your text editor] display ANSI color codes```.
 
+• If the setup.sh can't install a python package, try installing it manually with the command ```sudo pip3 install [package]```
+
 # Sidenote
 • If you like this project please consider giving it a star
 
