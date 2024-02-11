@@ -11,6 +11,6 @@ echo -e "${yellow}Making LFITester.py executable...${nocolor}"
 chmod +x LFITester.py
 
 echo -e "${yellow}Creating symlink for LFITester.py...${nocolor}"
-ln -s $(pwd)/LFITester.py /bin/lfitester
+sudo ln -svf $(pwd)/LFITester.py /bin/lfitester
 
 echo -e "${boldgreen}Everything\'s setup! Simply run lfitester to get started!${nocolor}"
