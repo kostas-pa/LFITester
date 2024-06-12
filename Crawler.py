@@ -12,7 +12,7 @@ def get_links_creds(url,creds_str):
 	list_creds = creds_str.split(':')
 	user = list_creds[0]
 	passwd = list_creds[1]
-	soup = BeautifulSoup(requests.get(url, auth=HTTPBasicAuth(user, passwd)).content, "html.parser")
+	soup = BeautifulSoup(requests.get(url, auth=HTTPBasicAuth(user, passwd), verify=False).content, "html.parser")
 	for a_tag in soup.find_all('a'):
 		href = a_tag.get("href")
 		if href == "" or href is None:
@@ -28,7 +28,7 @@ def get_links(url):
 	links = set()
 	# Get only the domain name to crawl it
 	domain = urlparse(url).netloc
-	soup = BeautifulSoup(requests.get(url).content, "html.parser")
+	soup = BeautifulSoup(requests.get(url, verify=False).content, "html.parser")
 	for a_tag in soup.find_all('a'):
 		href = a_tag.get("href")
 		if href == "" or href is None:

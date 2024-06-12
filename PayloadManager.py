@@ -294,6 +294,7 @@ class Payload:
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: PHPSESSID cookie injection')
 		s = requests.Session()
+		s.verify = False
 		session = s.get(self.url, headers=fetchUA())
 		cookies = session.cookies.get_dict()
 		rce = []
@@ -324,7 +325,7 @@ class Payload:
 
 	def logPoisonCheck(self):
 		headers = {"User-Agent": self.payload}
-		response = requests.get(self.url, headers=headers)
+		response = requests.get(self.url, headers=headers, verify=False)
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
 
