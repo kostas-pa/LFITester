@@ -1,8 +1,8 @@
-beautifulsoup4==4.12.2
-GitPython==3.1.40
-lxml==4.9.3
-pwn==1.0
-pwntools==4.11.1
-pyfiglet==1.0.2
-requests==2.31.0
-termcolor==1.1.0
+beautifulsoup4
+GitPython
+lxml
+pwn
+pwntools
+pyfiglet
+requests
+termcolor
