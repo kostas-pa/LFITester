@@ -55,7 +55,8 @@ $python3 LFITester.py
                                                                                           LFITester
                                                                                     Automated LFI Testing
 **********************************************************************************************************************************************************************************************
-usage: LFITester.py [-h] [-u URL] [-L URL_File] [-c] [-v] [-o [OUTFILE]] [--creds [user:pass]] [-p] [--autopwn IP] [-m Payload] [-f] [--update] [--batch-ans BATCH] [-s]
+usage: LFITester.py [-h] [-u URL] [-L URL_File] [-c] [-v] [-o [OUTFILE]] [--creds [user:pass]] [-p] [--autopwn IP]
+                    [-m Payload] [-f] [--update] [--batch-ans BATCH] [-s] [--poc-file POC] [-H HEADERS] [-C COOKIES]
 
         Payload Modes:
         0:  Simple bash TCP
@@ -107,7 +108,7 @@ usage: LFITester.py [-h] [-u URL] [-L URL_File] [-c] [-v] [-o [OUTFILE]] [--cred
         46: Ncat
         47: Ncat UDP 
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -u URL, --url URL     The url to test. The URL usually is http://[URL]?[something]=
   -L URL_File, --list-url URL_File
@@ -117,15 +118,22 @@ optional arguments:
   -o [OUTFILE], --output [OUTFILE]
                         The file to save the results
   --creds [user:pass]   The credentials to login
-  -p, --enable-proxies  Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be
-                        overridden! Note that the proxies will be picked at random for each request
-  --autopwn IP          If the webapp is vulnerable to LFI then it will attempt to exploit it and give back a shell. This option requires your IP in order to connect with the revshell
+  -p, --enable-proxies  Enable proxy redirection. Default proxies are free and you can change them. If you don't want the
+                        default proxies you can supply your own and this option will be overridden! Note that the proxies
+                        will be picked at random for each request
+  --autopwn IP          If the webapp is vulnerable to LFI then it will attempt to exploit it and give back a shell. This
+                        option requires your IP in order to connect with the revshell
   -m Payload, --mode Payload
                         Select the payload that suits best. Try different ones if the exploit doesn't work.
   -f, --force           Treat endpoint as alive even if it returns 404
   --update              Update LFITester
   --batch-ans BATCH     Answer all yes/no
   -s, --stealth         Enable stealth mode
+  --poc-file POC        Your custom poc file.
+  -H HEADERS, --headers HEADERS
+                        Add extra headers
+  -C COOKIES, --cookies COOKIES
+                        Add extra cookies
 
 Proxies in the list must be in the following format: protocol://{proxyip} 
 username:password (newline). If you dont have a authenticated 
@@ -140,6 +148,7 @@ Examples:
 
 Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
             Konstantinos Pantazis   (https://github.com/kostas-pa)
+
 
 ```
 
