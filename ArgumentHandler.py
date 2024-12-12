@@ -45,6 +45,8 @@ class ArgumentHandler:
         self.enable_proxies = args.enabled_proxies
         self.outfile = args.outfile
         self.creds = args.creds
+        self.headers = args.headers
+        self.cookies = args.cookies
         self.autopwn = args.autopwn
         self.mode = args.mode
         
@@ -165,6 +167,8 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
         parser.add_argument('--batch-ans', dest='batch', help="Answer all yes/no", type=str)
         parser.add_argument('-s', '--stealth', dest='stealth', help='Enable stealth mode', action='store_true')
         parser.add_argument('--poc-file', dest='poc', help="Your custom poc file.", type=argparse.FileType('r'))
+        parser.add_argument('-H', '--headers', dest="headers", metavar='HEADERS', help='Add extra headers')
+        parser.add_argument('-C', '--cookies', dest="cookies", metavar='COOKIES', help='Add extra cookies')
         return parser
 
 

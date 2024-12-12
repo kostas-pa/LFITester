@@ -42,21 +42,21 @@ def main():
 				test_urls = webcrawler(arghandler.url, check, arghandler.creds)
 				for url in test_urls:
 					print(colored(f"Testing: {url}\n\n", 'green'))
-					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
+					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, arghandler.headers, arghandler.cookies, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
 			else:
 				print(colored(f"Testing: {arghandler.url}\n\n", 'green'))
-				PayloadManager.Payload(arghandler.url, arghandler.outfile, arghandler.creds, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
+				PayloadManager.Payload(arghandler.url, arghandler.outfile, arghandler.creds, arghandler.headers, arghandler.cookies, verbosity=arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
 		else:
 			if arghandler.crawler:
 				for url in arghandler.url:
 					test_urls = webcrawler(url, check, arghandler.creds)
 					for endpoint in test_urls:
 						print(colored(f"Testing: {endpoint}\n\n", 'green'))
-						PayloadManager.Payload(endpoint, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
+						PayloadManager.Payload(endpoint, arghandler.outfile, arghandler.creds, arghandler.headers, arghandler.cookies, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
 			else:
 				for url in arghandler.url:
 					print(colored(f"Testing: {url}\n\n", 'green'))
-					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
+					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, arghandler.headers, arghandler.cookies, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
 	except KeyboardInterrupt:
 		print('\nGracefully Exiting...\n')
 		os._exit(0)
