@@ -5,7 +5,7 @@ boldgreen="\033[1;32m"
 nocolor="\033[0m"
 
 echo -e "${yellow}Installing the required packages...${nocolor}"
-pip3 install -r requirements.txt
+pip3 install -r requirements.txt --break-system-packages
 
 echo -e "${yellow}Making LFITester.py executable...${nocolor}"
 chmod +x LFITester.py
