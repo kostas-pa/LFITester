@@ -213,7 +213,7 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
         parser.add_argument('--poc-file', dest='poc', help="Your custom poc file.", type=argparse.FileType('r'))
         parser.add_argument('-H', '--headers', dest="headers", metavar='HEADERS', help='Add extra headers')
         parser.add_argument('-C', '--cookies', dest="cookies", metavar='COOKIES', help='Add extra cookies')
-        parser.add_argument('--packet-file', dest="packet_file", metavar='PACKET_FILE', 
+        parser.add_argument("-r", '--packet-file', dest="packet_file", metavar='PACKET_FILE', 
                            help='Import headers/cookies/body from a packet file (HTTP or Burp format)')
         return parser
 
