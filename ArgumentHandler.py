@@ -8,6 +8,7 @@ except ImportError:
     print("There were issues importing git. Auto-update might fail...")
 import os
 from termcolor import colored
+from PacketParser import PacketParser
 
 
 class ArgumentHandler:
@@ -64,6 +65,49 @@ class ArgumentHandler:
                 self.batch = None
         else:
             self.batch = None
+
+        if args.packet_file:
+            try:
+                parser = PacketParser(args.packet_file)
+                imported_headers, imported_cookies, imported_body, imported_url = parser.parse()
+                
+                # Merge imported headers with any manually specified headers
+                if imported_headers:
+                    if self.headers:
+                        # Convert string headers to dict if specified manually
+                        if isinstance(self.headers, str):
+                            header_dict = {}
+                            for header in self.headers.split(','):
+                                key, value = header.split(':', 1)
+                                header_dict[key.strip()] = value.strip()
+                            self.headers = header_dict
+                        self.headers.update(imported_headers)
+                    else:
+                        self.headers = imported_headers
+                        
+                # Merge imported cookies with any manually specified cookies
+                if imported_cookies:
+                    if self.cookies:
+                        # Convert string cookies to dict if specified manually
+                        if isinstance(self.cookies, str):
+                            cookie_dict = {}
+                            for cookie in self.cookies.split(';'):
+                                key, value = cookie.split('=', 1)
+                                cookie_dict[key.strip()] = value.strip()
+                            self.cookies = cookie_dict
+                        self.cookies.update(imported_cookies)
+                    else:
+                        self.cookies = imported_cookies
+                        
+                # Use imported URL if none was specified and it's valid
+                if imported_url and not self.url:
+                    if imported_url.startswith(('http://', 'https://')):
+                        self.url = imported_url
+                    else:
+                        print(colored("[!] Invalid URL format from packet file", 'red'))
+                        
+            except Exception as e:
+                print(colored(f"[!] Error parsing packet file: {str(e)}", 'red'))
 
     def update(self):
         print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')
@@ -169,6 +213,8 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
         parser.add_argument('--poc-file', dest='poc', help="Your custom poc file.", type=argparse.FileType('r'))
         parser.add_argument('-H', '--headers', dest="headers", metavar='HEADERS', help='Add extra headers')
         parser.add_argument('-C', '--cookies', dest="cookies", metavar='COOKIES', help='Add extra cookies')
+        parser.add_argument("-r", '--packet-file', dest="packet_file", metavar='PACKET_FILE', 
+                           help='Import headers/cookies/body from a packet file (HTTP or Burp format)')
         return parser
 
 
