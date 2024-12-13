@@ -59,7 +59,7 @@ def main():
 					PayloadManager.Payload(url, arghandler.outfile, arghandler.creds, arghandler.headers, arghandler.cookies, verbosity = arghandler.verbosity, attempt_shell=arghandler.autopwn, mode=arghandler.mode, force=arghandler.force, batch=arghandler.batch, stealth=arghandler.stealth, poc=poc, override_poc=arghandler.override_poc)
 	except KeyboardInterrupt:
 		print('\nGracefully Exiting...\n')
-		os._exit(0)
+		return
 
 	
 	
