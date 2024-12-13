@@ -66,48 +66,14 @@ class ArgumentHandler:
         else:
             self.batch = None
 
+        # Parse packet file if provided
         if args.packet_file:
-            try:
-                parser = PacketParser(args.packet_file)
-                imported_headers, imported_cookies, imported_body, imported_url = parser.parse()
-                
-                # Merge imported headers with any manually specified headers
-                if imported_headers:
-                    if self.headers:
-                        # Convert string headers to dict if specified manually
-                        if isinstance(self.headers, str):
-                            header_dict = {}
-                            for header in self.headers.split(','):
-                                key, value = header.split(':', 1)
-                                header_dict[key.strip()] = value.strip()
-                            self.headers = header_dict
-                        self.headers.update(imported_headers)
-                    else:
-                        self.headers = imported_headers
-                        
-                # Merge imported cookies with any manually specified cookies
-                if imported_cookies:
-                    if self.cookies:
-                        # Convert string cookies to dict if specified manually
-                        if isinstance(self.cookies, str):
-                            cookie_dict = {}
-                            for cookie in self.cookies.split(';'):
-                                key, value = cookie.split('=', 1)
-                                cookie_dict[key.strip()] = value.strip()
-                            self.cookies = cookie_dict
-                        self.cookies.update(imported_cookies)
-                    else:
-                        self.cookies = imported_cookies
-                        
-                # Use imported URL if none was specified and it's valid
-                if imported_url and not self.url:
-                    if imported_url.startswith(('http://', 'https://')):
-                        self.url = imported_url
-                    else:
-                        print(colored("[!] Invalid URL format from packet file", 'red'))
-                        
-            except Exception as e:
-                print(colored(f"[!] Error parsing packet file: {str(e)}", 'red'))
+            parser = PacketParser(args.packet_file)
+            if not self.headers:  # Only use parsed headers if none provided via CLI
+                self.headers = parser.get_headers()
+            if not self.cookies:  # Only use parsed cookies if none provided via CLI
+                self.cookies = parser.get_cookies()
+
 
     def update(self):
         print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')

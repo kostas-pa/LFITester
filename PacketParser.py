@@ -1,136 +1,95 @@
-import base64
 import xml.etree.ElementTree as ET
-from termcolor import colored
-from urllib.parse import urljoin
+import base64
+import re
 
 class PacketParser:
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self, packet_file):
+        self.packet_file = packet_file
         self.headers = {}
         self.cookies = {}
         self.body = ""
-        self.url = ""
-        self.host = ""
-        self.protocol = "http"
         
-    def parse(self):
-        """Determine file type and parse accordingly"""
+        # Determine file type and parse accordingly
+        if self.is_burp_file():
+            self.parse_burp_file()
+        else:
+            self.parse_raw_http()
+
+    def is_burp_file(self):
+        """Check if file is a Burp Suite XML export"""
         try:
-            with open(self.file_path, 'r') as f:
-                content = f.read()
+            with open(self.packet_file, 'r') as f:
+                first_line = f.readline().strip()
+                return first_line.startswith('<?xml')
+        except:
+            return False
+
+    def parse_burp_file(self):
+        """Parse Burp Suite XML export file"""
+        tree = ET.parse(self.packet_file)
+        root = tree.getroot()
+        
+        # Get the first request item
+        item = root.find('item')
+        if item is None:
+            return
+            
+        # Get base64 encoded request
+        request = item.find('request')
+        if request is None or request.text is None:
+            return
+            
+        # Decode base64 request
+        raw_request = base64.b64decode(request.text).decode('utf-8')
+        
+        # Parse the raw request
+        self.parse_raw_http_content(raw_request)
+
+    def parse_raw_http(self):
+        """Parse raw HTTP request file"""
+        with open(self.packet_file, 'r') as f:
+            content = f.read()
+        self.parse_raw_http_content(content)
+
+    def parse_raw_http_content(self, content):
+        """Parse raw HTTP request content"""
+        # Split headers and body
+        parts = content.split('\n\n', 1)
+        headers_section = parts[0]
+        self.body = parts[1] if len(parts) > 1 else ""
+
+        # Parse headers
+        lines = headers_section.split('\n')
+        for line in lines[1:]:  # Skip first line (HTTP method line)
+            if not line.strip():
+                continue
+            if ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip()
+                value = value.strip()
                 
-            if content.startswith('<?xml'):
-                print(colored("[*] Detected Burp Suite XML format", 'blue'))
-                return self._parse_burp_file(content)
-            else:
-                print(colored("[*] Detected raw HTTP format", 'blue'))
-                return self._parse_raw_http(content)
-        except Exception as e:
-            print(colored(f"[!] Error reading packet file: {str(e)}", 'red'))
-            raise
-    
-    def _parse_burp_file(self, content):
-        """Parse Burp XML file format"""
-        try:
-            root = ET.fromstring(content)
-            for item in root.findall('.//item'):
-                # Get protocol, host and port
-                protocol = item.find('protocol')
-                host = item.find('host')
-                port = item.find('port')
-                
-                if protocol is not None:
-                    self.protocol = protocol.text.lower()
-                if host is not None:
-                    self.host = host.text
-                
-                request = item.find('request')
-                if request is not None:
-                    request_content = request.text
-                    is_base64 = request.get('base64', 'false') == 'true'
-                    
-                    if is_base64:
-                        print(colored("[*] Decoding base64 request content", 'blue'))
-                        request_content = base64.b64decode(request_content).decode('utf-8')
-                    
-                    self._parse_raw_http(request_content)
-                    break  # Only parse first request for now
-            
-            # Construct full URL
-            if self.host and self.url:
-                base_url = f"{self.protocol}://{self.host}"
-                self.url = urljoin(base_url, self.url)
-                print(colored(f"[+] Constructed full URL: {self.url}", 'green'))
-            
-            print(colored("[+] Successfully parsed Burp request", 'green'))
-            self._print_parsed_info()
-            return self.headers, self.cookies, self.body, self.url
-        except Exception as e:
-            print(colored(f"[!] Error parsing Burp file: {str(e)}", 'red'))
-            raise
-    
-    def _parse_raw_http(self, content):
-        """Parse raw HTTP request format"""
-        try:
-            lines = content.split('\n')
-            
-            # Parse request line
-            if lines[0].startswith('GET') or lines[0].startswith('POST'):
-                request_parts = lines[0].split(' ')
-                if len(request_parts) >= 2:
-                    self.url = request_parts[1]
-                    print(colored(f"[+] Found path: {self.url}", 'green'))
-            
-            # Parse headers and cookies
-            header_section = True
-            body_lines = []
-            
-            for line in lines[1:]:
-                line = line.strip()
-                if not line:
-                    header_section = False
-                    continue
-                    
-                if header_section:
-                    if ':' in line:
-                        key, value = line.split(':', 1)
-                        key = key.strip()
-                        value = value.strip()
-                        
-                        if key.lower() == 'host':
-                            self.host = value
-                            print(colored(f"[+] Found host: {self.host}", 'green'))
-                        elif key.lower() == 'cookie':
-                            # Parse cookies
-                            cookie_pairs = value.split(';')
-                            for pair in cookie_pairs:
-                                if '=' in pair:
-                                    c_key, c_value = pair.strip().split('=', 1)
-                                    self.cookies[c_key] = c_value
-                        else:
-                            self.headers[key] = value
+                # Handle cookies separately
+                if key.lower() == 'cookie':
+                    self.parse_cookies(value)
                 else:
-                    body_lines.append(line)
-            
-            # For raw HTTP, construct full URL if we have both host and path
-            if self.host and self.url and not self.url.startswith('http'):
-                base_url = f"{self.protocol}://{self.host}"
-                self.url = urljoin(base_url, self.url)
-                print(colored(f"[+] Constructed full URL: {self.url}", 'green'))
-            
-            self.body = '\n'.join(body_lines)
-            print(colored("[+] Successfully parsed HTTP request", 'green'))
-            self._print_parsed_info()
-            return self.headers, self.cookies, self.body, self.url
-        except Exception as e:
-            print(colored(f"[!] Error parsing HTTP request: {str(e)}", 'red'))
-            raise
-            
-    def _print_parsed_info(self):
-        """Print summary of parsed information"""
-        if self.headers:
-            print(colored(f"[+] Found {len(self.headers)} headers", 'green'))
-        if self.cookies:
-            print(colored(f"[+] Found {len(self.cookies)} cookies", 'green'))
-        if self.body:
-            print(colored("[+] Request body found", 'green')) 
+                    self.headers[key] = value
+
+    def parse_cookies(self, cookie_string):
+        """Parse cookie string into dictionary"""
+        cookies = cookie_string.split(';')
+        for cookie in cookies:
+            if '=' in cookie:
+                key, value = cookie.split('=', 1)
+                self.cookies[key.strip()] = value.strip()
+
+    def get_headers(self):
+        """Return parsed headers"""
+        return self.headers
+
+    def get_cookies(self):
+        """Return parsed cookies"""
+        return self.cookies
+
+    def get_body(self):
+        """Return request body"""
+        return self.body
