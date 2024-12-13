@@ -120,8 +120,10 @@ class PacketParser:
         self.body = '\n'.join(body_lines)
 
     def get_headers(self):
-        """Return parsed headers"""
-        return self.headers
+        """Return parsed headers without 'Host' header"""
+        headers_copy = self.headers.copy()  # Create a copy of the headers
+        headers_copy.pop('Host', None)  # Remove the 'Host' header if it exists
+        return headers_copy
 
     def get_cookies(self):
         """Return parsed cookies"""
