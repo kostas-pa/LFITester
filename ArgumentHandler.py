@@ -69,15 +69,12 @@ class ArgumentHandler:
         # Parse packet file if provided
         if args.packet_file:
             parser = PacketParser(args.packet_file)
-            if not self.headers:  # Only use parsed headers if none provided via CLI
-                self.headers = parser.get_headers()
-                print("Got headers", self.headers)
-            if not self.cookies:  # Only use parsed cookies if none provided via CLI
-                self.cookies = parser.get_cookies()
-                print("Got cookies", self.cookies)
-            if not self.url:    # Only use parsed url if none provided via CLI
-                self.url = parser.get_url()
-                print("Got url", self.url)
+            self.headers = parser.get_headers()
+            print("Got headers", self.headers)
+            self.cookies = parser.get_cookies()
+            print("Got cookies", self.cookies)
+            self.url = parser.get_url()
+            print("Got url", self.url)
 
 
     def update(self):
