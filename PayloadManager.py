@@ -189,8 +189,8 @@ class Payload:
 
 
     def string_to_dict(self, header_or_cookie_string):
-        if header_or_cookie_string is None or isinstance(header_or_cookie_string, dict):  # Check if it's None or already a dict
-            return
+        if header_or_cookie_string is None: return None
+        if isinstance(header_or_cookie_string, dict): return dict(header_or_cookie_string)
 
         # Split the string into individual key-value pairs, then split each pair by the first ':' for headers or '=' for cookies
         result = {}
@@ -246,10 +246,6 @@ class Payload:
             print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
             print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
             return False
-
-
-
-
 
 
     def cred(self, url):
