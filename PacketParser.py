@@ -11,6 +11,7 @@ class PacketParser:
         self.method = ""
         self.url = ""
         self.path = ""
+        self.protocol = "https"
         
         # Determine file type and parse accordingly
         if self.is_burp_file():
@@ -37,6 +38,13 @@ class PacketParser:
         if item is None:
             return
             
+        # Get the protocol
+        protocol = item.find('protocol')
+        if protocol is not None and protocol.text is not None:
+            self.protocol = protocol.text.strip()  # Store the protocol (http or https)
+        else:
+            self.protocol = "http"  # Default to http if not specified
+        
         # Get base64 encoded request
         request = item.find('request')
         if request is None or request.text is None:
@@ -66,6 +74,14 @@ class PacketParser:
         request_line = lines[0].strip()  # First line contains method and URL
         if request_line:
             self.method, self.url, _ = request_line.split(' ', 2)
+            
+            # Check for Host header
+            host = self.headers.get('Host')
+            if not host:
+                raise ValueError("Not a valid packet file: Host header is missing.")
+            
+            # Construct the full URL
+            self.url = f"{self.protocol}://{host}{self.url}"  # Update URL construction
             self.path = self.url.split('?')[0]  # Extract path without query parameters
 
         # Parse headers
