@@ -376,6 +376,7 @@ class Payload:
     def logPoisonCheck(self):
         headers = {"User-Agent": self.payload}
         if self.cookies is not None:
+            cookies = self.cookies if isinstance(self.cookies, dict) else self.string_to_dict(self.cookies) if hasattr(self, 'cookies') else None
             response = requests.get(self.domain, headers=headers, cookies=cookies, verify=False)
         else:
             response = requests.get(self.url, headers=headers, verify=False)
