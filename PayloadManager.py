@@ -172,6 +172,7 @@ class Payload:
             if self.cookies is not None:
                 if isinstance(self.cookies, str):  # If cookies is a string
                     self.cookies = self.string_to_dict(self.cookies)  # Convert to dict
+            print(colored("[DEBUG]", 'blue') + f" Ready to send: {url})")
 
             if self.creds is not None:
                 response = self.cred(url)
@@ -184,6 +185,8 @@ class Payload:
             else:
                 response = requests.get(url, verify=False)
             response = str(response.text)
+            if response:
+                print(colored("[DEBUG]", 'blue') + f" Got response: {url} (Type: {type(url)})")  # Debugging info
             return self.stripHtmlTags(response)
         
         except HTTPError as e:
@@ -196,7 +199,6 @@ class Payload:
 
 
     def string_to_dict(self, header_or_cookie_string):
-        print("string_to_dict")
         if header_or_cookie_string is None or isinstance(header_or_cookie_string, dict):  # Check if it's None or already a dict
             return
 
