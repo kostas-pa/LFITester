@@ -196,6 +196,7 @@ class Payload:
 
 
     def string_to_dict(self, header_or_cookie_string):
+        print("string_to_dict")
         if header_or_cookie_string is None or isinstance(header_or_cookie_string, dict):  # Check if it's None or already a dict
             return
 
