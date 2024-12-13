@@ -186,7 +186,7 @@ class Payload:
 		except URLError as e:
 			print(colored('[-]', 'red', attrs=['bold']) + ' Reason: ' + str(e))
 		except http.client.RemoteDisconnected as e:
-   			print(colored('[-]','red', attrs['bold']) + ' Reason: ' +  str(e) + "\nAborting endpoint...")
+   			print(colored('[-]','red', attrs=['bold']) + ' Reason: ' +  str(e) + "\nAborting endpoint...")
 
 
 
@@ -341,6 +341,7 @@ class Payload:
 	# Checks if the PHPSESSID cookie can be exploited
 	def cookieCheck(self):
 		if self.verbosity > 1:
+			cookies = self.cookies if isinstance(self.cookies, dict) else self.string_to_dict(self.cookies) if hasattr(self, 'cookies') else None
 			print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: PHPSESSID cookie injection')
 		s = requests.Session()
 		s.verify = False
