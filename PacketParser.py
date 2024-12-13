@@ -8,10 +8,11 @@ class PacketParser:
         self.headers = {}
         self.cookies = {}
         self.body = ""
-        self.method = ""
+        self.method = "" # Not implmented
         self.url = ""
         self.path = ""
         self.protocol = "https"
+        self.is_burp = "false"
         
         # Determine file type and parse accordingly
         if self.is_burp_file():
@@ -30,6 +31,7 @@ class PacketParser:
 
     def parse_burp_file(self):
         """Parse Burp Suite XML export file"""
+        self.is_burp = True
         tree = ET.parse(self.packet_file)
         root = tree.getroot()
         
@@ -38,6 +40,13 @@ class PacketParser:
         if item is None:
             return
             
+        # Get the URL from the Burp file
+        url_element = item.find('url')
+        if url_element is not None and url_element.text is not None:
+            self.url = url_element.text.strip()[9:-3]  # Store the URL without CDATA
+        else:
+            self.url = ""  # Default to empty if not found
+        
         # Get the protocol
         protocol = item.find('protocol')
         if protocol is not None and protocol.text is not None:
@@ -71,9 +80,10 @@ class PacketParser:
 
         # Parse the first line to get method and URL
         lines = headers_section.split('\n')
+
         request_line = lines[0].strip()  # First line contains method and URL
-        if request_line:
-            self.method, self.url, _ = request_line.split(' ', 2)
+        if request_line and not self.is_burp:
+            self.method, self.path, _ = request_line.split(' ', 2)
             
             # Check for Host header
             host = self.headers.get('Host')
@@ -81,8 +91,8 @@ class PacketParser:
                 raise ValueError("Not a valid packet file: Host header is missing.")
             
             # Construct the full URL
-            self.url = f"{self.protocol}://{host}{self.url}"  # Update URL construction
-            self.path = self.url.split('?')[0]  # Extract path without query parameters
+            self.url = f"{self.protocol}://{host}{self.path}"  # Update URL construction
+            # self.path = self.url.split('?')[0]  # Extract path without query parameters
 
         # Parse headers
         for line in lines[1:]:  # Skip first line (HTTP method line)
