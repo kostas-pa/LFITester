@@ -116,7 +116,7 @@ class ArgumentHandler:
         # Find the repo of the program
         repo = git.Repo(repo_path)
         # Stash any changes done locally so as to not have any problem the pull request
-        repo.git.stash()
+        repo.git.stash('--include-untracked')
         # Git pull to do the update
         repo.remotes.origin.pull()
         # Give execute permition to the main program after the update
