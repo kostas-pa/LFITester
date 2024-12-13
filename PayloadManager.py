@@ -227,7 +227,8 @@ class Payload:
             else:
                 # Include the headers and cookies in the request
                 ret = requests.get(self.domain, headers=headers, cookies=cookies, verify=False)
-            if ret.status_code == 200 or ret.status_code == 400 or ret.status_code == 403 or ret.status_code == 500:
+            
+            if ret.status_code in [200, 400, 403, 500]:
                 print(colored(str(ret.status_code) + " - OK", 'green'))
                 return True
             else:
@@ -240,7 +241,10 @@ class Payload:
             return False
         except Exception as e:
             # Catching generic exceptions
-            print(colored(str(ret.status_code) + " - DEAD", 'red'))
+            if ret.status_code:
+                print(colored(str(ret.status_code) + " - DEAD", 'red'))
+            else:
+                print(colored("No status code", 'red'))
             print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
             print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
             return False
