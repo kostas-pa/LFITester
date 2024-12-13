@@ -160,22 +160,33 @@ class Payload:
             urllib.request.install_opener(opener)
         try:
             # Ensure headers and cookies are dictionaries, not strings
+            if self.headers is not None and isinstance(self.headers, str):
+                self.headers = self.string_to_dict(self.headers)  # Convert to dict
+            if self.cookies is not None and isinstance(self.cookies, str):
+                self.cookies = self.string_to_dict(self.cookies)  # Convert to dict
+
+            # Prepare the request parameters
+            request_params = {
+                'url': url,
+                'verify': False
+            }
+
+            # Include headers and cookies if they are available
             if self.headers is not None:
-                if isinstance(self.headers, str):  # If headers is a string
-                    self.headers = self.string_to_dict(self.headers)  # Convert to dict
+                request_params['headers'] = self.headers
             if self.cookies is not None:
-                if isinstance(self.cookies, str):  # If cookies is a string
-                    self.cookies = self.string_to_dict(self.cookies)  # Convert to dict
+                request_params['cookies'] = self.cookies
+
+            # Handle credentials if provided
             if self.creds is not None:
-                response = self.cred(url)
-            elif self.headers is not None and self.cookies is not None:
-                response = requests.get(url, headers=self.headers, cookies=self.cookies, verify=False)
-            elif self.headers is not None:
-                response = requests.get(url, headers=self.headers, verify=False)
-            elif self.cookies is not None:
-                response = requests.get(url, cookies=self.cookies, verify=False)
+                list_creds = self.creds.split(':')
+                user = list_creds[0]
+                passwd = list_creds[1] if len(list_creds) > 1 else None
+                response = requests.get(url, headers=self.headers, cookies=self.cookies, verify=False, auth=HTTPBasicAuth(user, passwd))
             else:
-                response = requests.get(url, verify=False)
+                # Make the request without credentials
+                response = requests.get(**request_params)
+
             response = str(response.text)
             return self.stripHtmlTags(response)
         
