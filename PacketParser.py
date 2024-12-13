@@ -122,8 +122,9 @@ class PacketParser:
     def get_headers(self):
         """Return parsed headers without 'Host' header"""
         headers_copy = self.headers.copy()  # Create a copy of the headers
-        headers_copy.pop('Host', None)  # Remove the 'Host' header if it exists
-
+        # Remove the 'Host' header if it exists, regardless of case
+        headers_copy = {k: v for k, v in headers_copy.items() if k.lower() != 'host'}
+        
         print("\nHeaders\n", headers_copy)
         return headers_copy
 
