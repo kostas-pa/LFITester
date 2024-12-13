@@ -123,10 +123,13 @@ class PacketParser:
         """Return parsed headers without 'Host' header"""
         headers_copy = self.headers.copy()  # Create a copy of the headers
         headers_copy.pop('Host', None)  # Remove the 'Host' header if it exists
+
+        print("\nHeaders\n", headers_copy)
         return headers_copy
 
     def get_cookies(self):
         """Return parsed cookies"""
+        print("\nCookies\n", self.cookies)
         return self.cookies
 
     def get_body(self):
