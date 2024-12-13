@@ -73,6 +73,8 @@ class ArgumentHandler:
                 self.headers = parser.get_headers()
             if not self.cookies:  # Only use parsed cookies if none provided via CLI
                 self.cookies = parser.get_cookies()
+            if not self.url:    # Only use parsed url if none provided via CLI
+                self.url = parser.get_url()
 
 
     def update(self):
@@ -162,6 +164,7 @@ Examples:
 
 Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
             Konstantinos Pantazis   (https://github.com/kostas-pa)
+            Timothy Stowe           (https://github.com/timothy90990)
             ''', formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument('-u', '--url', dest="input_url", metavar='URL', help='The url to test. The URL usually is http://[URL]?[something]=')
         parser.add_argument('-L', '--list-url', dest="input_url_file", metavar='URL_File', help='Input a list of URLs from an external file. The URLs format usually is http://[URL]?[something]=', type=argparse.FileType('r'))
