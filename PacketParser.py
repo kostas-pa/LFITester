@@ -110,6 +110,10 @@ class PacketParser:
                                 self.cookies[c_key.strip()] = c_value.strip()
                     
                     self.headers[key] = value
+                    
+                    # Check for Host header to construct URL
+                    if key.lower() == 'host':
+                        self.url = f"https://{value.strip()}{self.path}"
             else:
                 body_lines.append(line)
         
