@@ -70,13 +70,15 @@ class ArgumentHandler:
         if args.packet_file:
             parser = PacketParser(args.packet_file)
             self.headers = parser.get_headers()
-            print("Headers:")
-            for key, value in self.headers.items():
-                print(f"{key}: {value}")
+            if self.headers:
+                print("Headers:")
+                for key, value in self.headers.items():
+                    print(f"{key}: {value}")
             self.cookies = parser.get_cookies()
-            print("Cookies:")
-            for key, value in self.cookies.items():
-                print(f"{key}: {value}")
+            if self.cookies:
+                print("Cookies:")
+                for key, value in self.cookies.items():
+                    print(f"{key}: {value}")
             self.url = parser.get_url()
             print("Got url", self.url)
 
