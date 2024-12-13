@@ -214,24 +214,19 @@ class Payload:
 		self.domain = urllib.parse.urlparse(self.url).scheme + '://' + urllib.parse.urlparse(self.url).netloc
 		
 		# Convert headers and cookies from string to dictionary if they're in string format
-		headers = self.headers if isinstance(self.headers, dict) else self.string_to_dict(self.headers) if hasattr(self, 'headers') else fetchUA()
-		cookies = self.cookies if isinstance(self.cookies, dict) else self.string_to_dict(self.cookies) if hasattr(self, 'cookies') else None
+		headers = self.headers if isinstance(self.headers, dict) else self.string_to_dict(self.headers) if self.headers else fetchUA()
+		cookies = self.cookies if isinstance(self.cookies, dict) else self.string_to_dict(self.cookies) if self.cookies else None
 
 		try:
 			print("Checking Remote Server Health")
-			if self.proxies:
-				# Include the headers and cookies in the request
-				ret = requests.get(self.domain, headers=headers, cookies=cookies, proxies=fetch_proxy(), verify=False)
-			elif self.creds is not None:
-				ret = self.cred(self.url)
-			else:
-				# Include the headers and cookies in the request
-				ret = requests.get(self.domain, headers=headers, cookies=cookies, verify=False)
-			if ret.status_code == 200 or ret.status_code == 400 or ret.status_code == 403 or ret.status_code == 500:
-				print(colored(str(ret.status_code) + " - OK", 'green'))
+			# Include the headers and cookies in the request
+			ret = requests.get(self.domain, headers=headers, cookies=cookies, proxies=fetch_proxy() if self.proxies else None, verify=False)
+			
+			if ret.status_code in {200, 400, 403, 500}:
+				print(colored(f"{ret.status_code} - OK", 'green'))
 				return True
 			else:
-				print(colored(str(ret.status_code) + " - DEAD", 'red'))
+				print(colored(f"{ret.status_code} - DEAD", 'red'))
 				return False
 
 		except requests.exceptions.ConnectionError as e:
@@ -240,12 +235,8 @@ class Payload:
 			return False
 		except Exception as e:
 			# Catching generic exceptions
-			print(colored(str(ret.status_code) + " - DEAD", 'red'))
-			print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong, ', e)
-			print(colored('[!]', 'yellow', attrs=['bold']) + ' The URL format must be http://[URL]?[something]=')
+			print(colored('[-]', 'red', attrs=['bold']) + ' Something went wrong: ' + str(e))
 			return False
-
-
 
 
 
