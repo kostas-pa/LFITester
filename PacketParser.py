@@ -8,6 +8,9 @@ class PacketParser:
         self.headers = {}
         self.cookies = {}
         self.body = ""
+        self.method = ""
+        self.url = ""
+        self.path = ""
         
         # Determine file type and parse accordingly
         if self.is_burp_file():
@@ -58,8 +61,14 @@ class PacketParser:
         headers_section = parts[0]
         self.body = parts[1] if len(parts) > 1 else ""
 
-        # Parse headers
+        # Parse the first line to get method and URL
         lines = headers_section.split('\n')
+        request_line = lines[0].strip()  # First line contains method and URL
+        if request_line:
+            self.method, self.url, _ = request_line.split(' ', 2)
+            self.path = self.url.split('?')[0]  # Extract path without query parameters
+
+        # Parse headers
         for line in lines[1:]:  # Skip first line (HTTP method line)
             if not line.strip():
                 continue
@@ -93,3 +102,15 @@ class PacketParser:
     def get_body(self):
         """Return request body"""
         return self.body
+
+    def get_method(self):
+        """Return HTTP method"""
+        return self.method
+
+    def get_url(self):
+        """Return full URL"""
+        return self.url
+
+    def get_path(self):
+        """Return path of the URL without query peramiters"""
+        return self.path
