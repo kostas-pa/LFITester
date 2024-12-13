@@ -169,6 +169,8 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
 
 • If the setup.sh can't install a python package, try installing it manually with the command ```sudo pip3 install [package]```
 
+• If it gets stuck just press enter, for now :)
+
 # Sidenote
 • If you like this project please consider giving it a star
 
