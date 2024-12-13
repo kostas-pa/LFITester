@@ -196,7 +196,7 @@ class Payload:
 
 
     def string_to_dict(self, header_or_cookie_string):
-        if header_or_cookie_string is None:
+        if header_or_cookie_string is None or isinstance(header_or_cookie_string, dict):  # Check if it's None or already a dict
             return
 
         # Split the string into individual key-value pairs, then split each pair by the first ':' for headers or '=' for cookies
@@ -331,7 +331,6 @@ class Payload:
             compUrl = self.url + self.filterBase + path
             if self.verbosity > 1:
                 print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
-                print(colored("[DEBUG]", 'blue') + f" Testing Directory Traversal with URL: {compUrl} (Type: {type(compUrl)})")  # Debugging info
             clean = self.hit(compUrl)
             words = clean.split()
             for word in words:
