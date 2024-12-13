@@ -131,7 +131,9 @@ class PacketParser:
     def get_cookies(self):
         """Return parsed cookies"""
         print("\nCookies\n", self.cookies)
-        return self.cookies
+        if self.cookies:
+            return self.cookies
+        return None
 
     def get_body(self):
         """Return request body"""
