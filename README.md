@@ -171,6 +171,8 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
 
 • If it gets stuck just press enter, for now :)
 
+• If you get strange encoding results, try to remove any value from the parameters, including Burp files.
+
 # Sidenote
 • If you like this project please consider giving it a star
 
