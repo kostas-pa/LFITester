@@ -100,7 +100,7 @@ class Payload:
 
 
 	# TO DO Threading doesn't work
-	# Added thread support for the attacks which speeds things up significantly!
+	# Added thread support for the attacks which speeds things up significantly! 
 	def Attack(self, attempt_shell=False, mode=0, force=False):
 		if not force and not self.urlCheck():
 			return
