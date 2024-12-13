@@ -124,13 +124,10 @@ class PacketParser:
         headers_copy = self.headers.copy()  # Create a copy of the headers
         # Remove the 'Host' header if it exists, regardless of case
         headers_copy = {k: v for k, v in headers_copy.items() if k.lower() != 'host'}
-        
-        print("\nHeaders\n", headers_copy)
-        return headers_copy
+        return self.headers == headers_copy
 
     def get_cookies(self):
         """Return parsed cookies"""
-        print("\nCookies\n", self.cookies)
         if self.cookies:
             return self.cookies
         return None
