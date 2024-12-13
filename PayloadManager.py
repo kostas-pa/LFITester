@@ -172,9 +172,9 @@ class Payload:
             if self.cookies is not None:
                 if isinstance(self.cookies, str):  # If cookies is a string
                     self.cookies = self.string_to_dict(self.cookies)  # Convert to dict
-            print(colored("[DEBUG]", 'blue') + f" Ready to send: {url})")
-            print(colored("[DEBUG]", 'yellow') + f" Ready to send: {self.headers}(Type: {type(self.headers)})")
-            print(colored("[DEBUG]", 'yellow') + f" Ready to send: {self.cookies}(Type: {type(self.cookies)})")
+            print(colored("[DEBUG]", 'blue') + f" Ready to url: {url})")
+            print(colored("[DEBUG]", 'yellow') + f" Ready to headers: {self.headers}(Type: {type(self.headers)})")
+            print(colored("[DEBUG]", 'yellow') + f" Ready to cookies: {self.cookies}(Type: {type(self.cookies)})")
 
             if self.creds is not None:
                 response = self.cred(url)
