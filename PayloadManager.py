@@ -438,7 +438,7 @@ class Payload:
                     ans = True
                 else:
                     ans = input(colored("Do you want to hit every known server type? (y/N) ", 'yellow')).strip().lower()
-                if ans != 'y':  # Simplified condition check
+                if ans == 'y':  # Simplified condition check
                     # Attempt to hit apache files first
                     ret = self.hitApache()	
                     # If we get a hit then return that. (No need to hit Nginx files)
