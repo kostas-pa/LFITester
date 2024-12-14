@@ -320,7 +320,7 @@ class Payload:
                         if self.verbosity > 0:
                             print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
             
-            if "uid=" in clean.lower() and (hitApache or hitNginx): # hitApache and hitNginx check
+            if "uid=" in clean.lower() and hit: # hitApache and hitNginx check
                 print(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + compUrl)
                 if self.outfile is not None:
                     self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Remote code execution (RCE) found with log poisong with the path ' + compUrl + '\n')
@@ -338,7 +338,7 @@ class Payload:
         for traversal in self.linux_dirTraversal:
             for poc in self.poc:
                 payload = traversal + poc
-                thread = threading.Thread(target=self.check_traversal, args=(payload, None))
+                thread = threading.Thread(target=self.check_traversal, args=(payload, None, False))
                 threads.append(thread)
                 thread.start()
 
@@ -373,7 +373,8 @@ class Payload:
         print(colored('[*]', 'yellow', attrs=['bold']) + ' Testing: Filter Bypass')
         threads = []
         for path in self.filterPaths:
-            thread = threading.Thread(target=self.check_traversal, args=(self.filterBase + path))
+            payload = self.filterBase + path
+            thread = threading.Thread(target=self.check_traversal, args=(payload, None, False))
             threads.append(thread)
             thread.start()
 
