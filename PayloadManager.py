@@ -337,7 +337,8 @@ class Payload:
         threads = []
         for traversal in self.linux_dirTraversal:
             for poc in self.poc:
-                thread = threading.Thread(target=self.check_traversal, args=(traversal + poc))
+                payload = traversal + poc
+                thread = threading.Thread(target=self.check_traversal, args=(payload))
                 threads.append(thread)
                 thread.start()
 
@@ -363,7 +364,7 @@ class Payload:
             else:
                 if self.verbosity > 0:
                     print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-        if len(self.rce_urls) == 0:  # Change rce to rce_urls
+        if not self.rce_urls:  # Change rce to rce_urls
             return False
         return self.rce_urls  # Change rce to rce_urls
     
@@ -489,7 +490,7 @@ class Payload:
                 # Combine the directory traversal path with the log path
                 traversal_path = d_path + l_path
                 # Use the check_traversal method to check for RCE
-                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, False, True))
+                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, False, False, True))
                 threads.append(thread)
                 thread.start()
 
@@ -514,7 +515,7 @@ class Payload:
                 # Combine the directory traversal path with the log path
                 traversal_path = d_path + l_path
                 # Use the check_traversal method to check for RCE
-                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, True))
+                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, False, False, True))
                 threads.append(thread)
                 thread.start()
 
