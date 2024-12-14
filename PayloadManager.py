@@ -276,14 +276,22 @@ class Payload:
 
 
 
-    # Checks for directory traversal
-    def dirTraversalCheck(self):
-        for traversal in self.linux_dirTraversal:
-            for poc in self.poc:
-                if not self.override_poc:
-                    compUrl = self.url + traversal + poc
-                else:
-                    compUrl = self.url + poc
+    # Updated dirTraversalCheck to accept specific parameters
+    def dirTraversalCheck(self, params=None):
+        # Extract parameters from the URL
+        parsed_url = urllib.parse.urlparse(self.url)
+        query_params = urllib.parse.parse_qs(parsed_url.query)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+
+        # Use provided params or all query parameters
+        params_to_check = params if params else query_params.keys()
+
+        def check_traversal(traversal, poc):
+            for param in params_to_check:
+                # Construct the URL with the current parameter being tested
+                new_query = query_params.copy()
+                new_query[param] = [traversal + poc]  # Test the current parameter
+                compUrl = f"{base_url}?{'&'.join([f'{k}={v[0]}' for k, v in new_query.items()])}"
                 if self.verbosity > 1:
                     print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
                 clean = self.hit(compUrl)
@@ -294,6 +302,16 @@ class Payload:
                 else:
                     if self.verbosity > 0:
                         print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
+
+        threads = []
+        for traversal in self.linux_dirTraversal:
+            for poc in self.poc:
+                thread = threading.Thread(target=check_traversal, args=(traversal, poc))
+                threads.append(thread)
+                thread.start()
+
+        for thread in threads:
+            thread.join()  # Wait for all threads to complete
 
 
 
@@ -321,29 +339,47 @@ class Payload:
     
     
     
-    # Checks if it can retrieve files with the php filter	
-    def filterCheck(self):
-        for path in self.filterPaths:
-            compUrl = self.url + self.filterBase + path
-            if self.verbosity > 1:
-                print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
-            clean = self.hit(compUrl)
-            words = clean.split()
-            for word in words:
-                try:
-                    base = base64.b64decode(word).decode()
-                except Exception as e:
-                    continue
-                if base.__contains__('<?php') or base.__contains__('<script'):
-                    print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
-                    if self.outfile is not None:
-                        self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
+    # Updated filterCheck to accept specific parameters
+    def filterCheck(self, params=None):
+        # Extract parameters from the URL
+        parsed_url = urllib.parse.urlparse(self.url)
+        query_params = urllib.parse.parse_qs(parsed_url.query)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+
+        # Use provided params or all query parameters
+        params_to_check = params if params else query_params.keys()
+
+        def check_filter(path):
+            for param in params_to_check:
+                # Construct the URL with the current parameter being tested
+                new_query = query_params.copy()
+                new_query[param] = [self.filterBase + path]  # Test the current parameter
+                compUrl = f"{base_url}?{'&'.join([f'{k}={v[0]}' for k, v in new_query.items()])}"
+                if self.verbosity > 1:
+                    print(colored('[*]', 'yellow', attrs=['bold']) + f' Testing: {compUrl}')
+                clean = self.hit(compUrl)
+                words = clean.split()
+                for word in words:
+                    try:
+                        base = base64.b64decode(word).decode()
+                    except Exception as e:
+                        continue
+                    if base.__contains__('<?php') or base.__contains__('<script'):
+                        print(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl)
+                        if self.outfile is not None:
+                            self.outfile.write(colored('[+]', 'green', attrs=['bold']) + ' Files can be retrieved with php filter like so (encoded in base64) ' + compUrl + '\n')			
                     else:
                         if self.verbosity > 0:
                             print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-            else:	
-                if self.verbosity > 0:
-                    print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
+
+        threads = []
+        for path in self.filterPaths:
+            thread = threading.Thread(target=check_filter, args=(path,))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()  # Wait for all threads to complete
 
 
 
@@ -401,15 +437,15 @@ class Payload:
                 if self.batch == True:
                     ans = True
                 else:
+                    print("\n")
                     print(colored('[?]', 'yellow') + " Hit every known server type? [y/N]: ", end='')
-                    ans = str(input())
-
+                    ans = str(input()).strip()  # Strip whitespace from input
+                    
                     if 'y' in ans.lower():
                         ans = True
                     else:
                         ans = False
-                    ans = True
-                if ans == True:
+                if ans:  # Simplified condition check
                     # Attempt to hit apache files first
                     ret = self.hitApache()	
                     # If we get a hit then return that. (No need to hit Nginx files)
