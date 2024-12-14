@@ -106,10 +106,13 @@ class Payload:
         if not force and not self.urlCheck():
             return
         
-        dirThread = threading.Thread(target=self.dirTraversalCheck, args=[])
-        dirThread.start()
-        filterThread = threading.Thread(target=self.filterCheck, args=[])
-        filterThread.start()
+        self.dirTraversalCheck()
+        self.filterCheck()
+        
+        #dirThread = threading.Thread(target=self.dirTraversalCheck, args=[])
+        #dirThread.start()
+        #filterThread = threading.Thread(target=self.filterCheck, args=[])
+        #filterThread.start()
         # The following three are used for autopwn purposes. You can thread them but you need to join them before jumping into autopwn(). Won't do this at this point. It's fast in any case.
         headerres = self.headerCheck()
         cookieres = self.cookieCheck()
@@ -434,15 +437,8 @@ class Payload:
                 if self.batch == True:
                     ans = True
                 else:
-                    print("\n")
-                    print(colored('[?]', 'yellow') + " Hit every known server type? [y/N]: ", end='')
-                    ans = str(input()).strip()  # Strip whitespace from input
-                    
-                    if 'y' in ans.lower():
-                        ans = True
-                    else:
-                        ans = False
-                if ans:  # Simplified condition check
+                    ans = input(colored("Do you want to hit every known server type? (y/N) ", 'yellow')).strip().lower()
+                if ans != 'y':  # Simplified condition check
                     # Attempt to hit apache files first
                     ret = self.hitApache()	
                     # If we get a hit then return that. (No need to hit Nginx files)
@@ -451,7 +447,10 @@ class Payload:
                     # Otherwise hit Nginx Files and return the results no matter what they are
                     return self.hitNginx()
 
-        # checks the type of the server
+        if 'Server' not in response.headers:
+            print(colored('[-]', 'red') + " Server header is missing. Cannot determine server type.")
+            return False
+        
         if "apache" in response.headers['Server'].lower() or 'litespeed' in response.headers['Server'].lower():
             return self.hitApache()			
 
