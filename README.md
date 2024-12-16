@@ -134,7 +134,7 @@ options:
                         Add extra headers
   -C COOKIES, --cookies COOKIES
                         Add extra cookies
-   -r PACKET_FILE, --packet-file PACKET_FILE
+  -r PACKET_FILE, --packet-file PACKET_FILE
                         Import headers/cookies/body from a packet file (HTTP or Burp format)
 
 Proxies in the list must be in the following format: protocol://{proxyip} 
