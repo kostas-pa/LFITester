@@ -4,7 +4,7 @@
 # DISCLAIMER
 • This tool is for educational purposes only.
 
-• We are not responsible for any illegal usage of this tool.
+• The developers and collaborators are not responsible for any illegal usage of this tool.
 
 
 
@@ -134,6 +134,8 @@ options:
                         Add extra headers
   -C COOKIES, --cookies COOKIES
                         Add extra cookies
+   -r PACKET_FILE, --packet-file PACKET_FILE
+                        Import headers/cookies/body from a packet file (HTTP or Burp format)
 
 Proxies in the list must be in the following format: protocol://{proxyip} 
 username:password (newline). If you dont have a authenticated 
@@ -148,8 +150,7 @@ Examples:
 
 Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
             Konstantinos Pantazis   (https://github.com/kostas-pa)
-
-
+            Timothy Stowe           (https://github.com/timothy90990)
 ```
 
 • Basic Usage: `python3 LFITester.py -u "http://myvulnerabledomain/vulnerable/application?test_param="`
